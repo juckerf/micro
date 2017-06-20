@@ -6,11 +6,7 @@ Micro provides minimalistic core features to write a new Application. Instead pr
 ## Requirements
 The library is only >= PHP7.1 compatible.
 
-## Quick start
-
-
-## API Documentation
-### Configuration (\Micro\Config)
+## Configuration (\Micro\Config)
 
 #### Read
 Simply read an xml configuration and initialize your configuration:
@@ -160,7 +156,7 @@ Meaning the above configuration gets parsed as the same Config object as the fol
 </config>
 ```
 
-### Logger (\Micro\Log)
+## Logger (\Micro\Log)
 
 #### Description
 \Micro\Log is a PSR-3 compatible logger with multiple log adapters.
@@ -220,7 +216,7 @@ The message formate is configured in each adapter separately. Available variable
 
 You can always create your own log adapter using \Micro\Log\Adapter\AdapterInterface.
 
-### HTTP (\Micro\Http)
+## HTTP (\Micro\Http)
 
 #### Initialize router
 The http router requires an array with http headers, usually this is $_SERVER and a PSR-3 compatible logger.
