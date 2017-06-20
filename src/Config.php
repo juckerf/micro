@@ -4,7 +4,8 @@ declare(strict_types=1);
 /**
  * Micro
  *
- * @copyright Copryright (c) 2017 gyselroth GmbH (https://gyselroth.com)
+ * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
+ * @license   MIT https://opensource.org/licenses/MIT
  */
 
 namespace Micro;
@@ -46,7 +47,7 @@ class Config implements ArrayAccess, Iterator, Countable
         } elseif (is_array($config)) {
             $this->store = $config;
         } elseif ($config !== null) {
-            throw new Exception('first param needs to be an instance of \Micro\Config\ConfigInterface or an array');
+            throw new Exception('first param needs to be an instance of ConfigInterface or an array');
         }
     }
 
