@@ -205,9 +205,123 @@ $config = new \Micro\Config(new \Micro\Config\Xml($path));
 $logger = new Logger($config);
 ```
 
+#### Format
+The message formate is configured in each adapter separately. Available variables are:
+* {message} - The message iteself
+* {date} - The current timestamp formatted with the configured date_format option
+* {level} - The log level, the configured number will be replaced with a string, for exampe 7 => debug
+* {context.} - You can acces each context option and include them in the message format. For example you have a context ['category' => 'router'] then you can configure {context.category} to include this context value within your message.
 
+#### Log adapters
+* \Micro\Log\Adapter\File
+* \Micro\Log\Adapter\Blackhole
+* \Micro\Log\Adapter\Stdout
+* \Micro\Log\Adapter\Syslog
 
-
+You can always create your own log adapter using \Micro\Log\Adapter\AdapterInterface.
 
 ### HTTP (\Micro\Http)
- new Router($_SERVER, $this->logger);
+
+#### Initialize router
+The http router requires an array with http headers, usually this is $_SERVER and a PSR-3 compatible logger.
+
+```php
+$router = new \Micro\Http\Router(array $server, \Psr\Log\LoggerInterface $logger)
+```
+
+#### Adding routes
+
+```php
+$router = (new \Micro\Http\Router($_SERVER, $logger))
+  ->clearRoutingTable() 
+  ->addRoute(new \Micro\Http\Router\Route('/api/v1/user', 'MyApp\Rest\v1\User'))
+  ->addRoute(new \Micro\Http\Router\Route('/api/v1/user/{uid:#([0-9a-z]{24})#}', 'MyApp\Rest\v1\User'))
+  ->addRoute(new \Micro\Http\Router\Route('/api/v1$', 'MyApp\Rest\v1\Rest'))
+  ->addRoute(new \Micro\Http\Router\Route('/api/v1', 'MyApp\Rest\v1\Rest'))
+  ->addRoute(new \Micro\Http\Router\Route('/api$', 'MyApp\Rest\v1\Rest'));
+  ->run(array $controller_params);
+```
+
+The router tries to map a request to the first matching route in his routing table. The request gets mappend to a class and method. Optional parameters/query string gets automatically submitted to the final controller class.
+
+Given the routing table above and the following final controller class:
+
+```php
+namespace MyApp\Rest\v1;
+
+class User 
+{
+    /**
+     * GET http://localhost/api/v1/user/540f1fc9a641e6eb708b4618/attributes
+     * GET http://localhost/api/v1/user/attributes?uid=540f1fc9a641e6eb708b4618
+     */
+    public function getAttributes(string $uid=null): \Micro\Http\Response
+    {
+            
+    }
+
+    /**
+     * GET http://localhost/api/v1/user/540f1fc9a641e6eb708b4618
+     * GET http://localhost/api/v1/user?uid=540f1fc9a641e6eb708b4618
+     */
+    public function get(string $uid=null): \Micro\Http\Response
+    {
+            
+    }
+
+    /**
+     * POST http://localhost/api/v1/user/540f1fc9a641e6eb708b4618/password / POST body password=1234
+     * POST http://localhost/api/v1/user/password?uid=540f1fc9a641e6eb708b4618 / POST body password=1234
+     * POST http://localhost/api/v1/user/password / POST body password=1234, uid=540f1fc9a641e6eb708b4618
+     */
+    public function postPassword(string $uid, string $password): \Micro\Http\Response
+    {
+            
+    }
+    
+    /**
+     * DELETE http://localhost/api/v1/user/540f1fc9a641e6eb708b4618/mail
+     * DELETE http://localhost/api/v1/user/mail?uid=540f1fc9a641e6eb708b4618
+     */
+    public function deleteMail(string $uid=null): \Micro\Http\Response
+    {
+            
+    }
+
+    /**
+     * DELETE http://localhost/api/v1/540f1fc9a641e6eb708b4618/mail
+     * DELETE http://localhost/api/v1/user?uid=540f1fc9a641e6eb708b4618
+     */
+    public function delete(string $uid=null): \Micro\Http\Response
+    {
+            
+    }
+
+    /**
+     * HEAD http://localhost/api/v1/user/540f1fc9a641e6eb708b4618
+     * HEAD http://localhost/api/v1/user?uid=540f1fc9a641e6eb708b4618
+     */
+    public function headExists(string $uid=null): \Micro\Http\Response
+    {
+            
+    }
+}
+```
+
+#### Response
+Each endpoint needs to return a Response object to the router.
+
+```php
+/**
+ * HEAD http://localhost/api/v1/user/540f1fc9a641e6eb708b4618
+ * HEAD http://localhost/api/v1/user?uid=540f1fc9a641e6eb708b4618
+ */
+public function headExists(string $uid=null): \Micro\Http\Response
+{
+  if(true) {
+    return (new \Micro\Http\Response())->setCode(200)->setBody('user does exists');
+  } else {
+    return (new \Micro\Http\Response())->setCode(404);  
+  }
+}
+```
