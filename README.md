@@ -8,6 +8,8 @@ The library is only >= PHP7.1 compatible.
 
 ## Quick start
 
+
+## API Documentation
 ### Configuration (\Micro\Config)
 
 #### Read
@@ -136,3 +138,76 @@ var_dump($config->b->child2);
 string(1) "a"
 string(1) "a"
 ```
+
+#### XML Attributes
+There is no more a difference between XML attributes and XML nodes. \Micro\Config\Xml parses both equally. So you can decide or switch on the fly whether a name/value should be an attribute or a node.
+```xml
+<config version="1.0">
+  <production>
+    <a enabled="1"/>
+  </development>
+</config>
+```
+Meaning the above configuration gets parsed as the same Config object as the following:
+
+```xml
+<config version="1.0">
+  <production>
+    <a>
+      <enabled>1</enabled>
+    </a>
+  </development>
+</config>
+```
+
+### Logger (\Micro\Log)
+
+#### Description
+\Micro\Log is a PSR-3 compatible logger with multiple log adapters.
+
+#### Initialize
+```php
+$logger = new Logger(Iterable $options);
+$logger->info(string $message, array $context);
+```
+
+#### Configuration
+```php
+$logger = new Logger([
+  'adapter_name' => [
+    'class'  => '\Micro\Log\Adapter\File',
+    'config' => [
+      'file'        => '/path/to/file',
+      'date_format' => 'Y-d-m H:i:s', //http://php.net/manual/en/function.date.php
+      'format'      => '{date} {level} {message} {context.category}',
+      'level'       => 7 //PSR-3 log levels 1-7
+    ],
+  ],
+  'adapter2_name' => []
+]);
+```
+Of course you can initialize the logger with a configuration object as well (any any other iterable objects):
+```xml
+<log>
+  <adapter_name enabled="1" class="\Micro\Log\Adapter\File">
+    <config>
+      <file>/path/to/file</file>
+      <date_format>Y-d-m H:i:s</date_format>
+      <format>{date} {level} {message} {context.category}</format>
+      <level>7</level>
+    </config
+  </adapter_name>
+</log>
+```
+
+```php
+$config = new \Micro\Config(new \Micro\Config\Xml($path));
+$logger = new Logger($config);
+```
+
+
+
+
+
+### HTTP (\Micro\Http)
+ new Router($_SERVER, $this->logger);
