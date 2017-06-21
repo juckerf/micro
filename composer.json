@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Micro\\": "src/lib/Micro",
+            "Micro\\": "src",
             "Micro\\Testsuite\\": "tests"
         }
     },
