@@ -17,7 +17,7 @@ use \Micro\Log\Adapter\AbstractAdapter;
 use \Micro\Log\Adapter\AdapterInterface;
 use \Micro\Config;
 
-class Logger extends AbstractLogger implements LoggerInterface
+class Log extends AbstractLogger implements LoggerInterface
 {
     /**
      * Priorities
