@@ -1,5 +1,6 @@
 # Micro (Yet another PHP Framework)
 
+[![Build Status](https://travis-ci.org/gyselroth/micro.svg?branch=master)](https://travis-ci.org/gyselroth/micro)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/micro/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/micro/?branch=master)
 
 ## Description
