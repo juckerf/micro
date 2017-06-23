@@ -13,7 +13,8 @@ class RouterTest extends TestCase
             'PATH_INFO' => 'index.php/api/my/path'
         ];
 
-        $this->router = new Router($server, new MockLogger());
-        $this->assertEqual($router->getPath(), 'index.php/api/my/path');
+        $router = new Router($server, new MockLogger());
+        $this->assertEquals($router->getPath(), 'index.php/api/my/path');
+        return $router;
     }
 }
