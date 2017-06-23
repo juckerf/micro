@@ -2,4 +2,7 @@ language: php
 php:
   - '7.1'
 sudo: false
+before_script:
+  - composer self-update
+  - composer install
 script: phpunit --bootstrap tests/Bootstrap.php  tests/
