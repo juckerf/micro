@@ -10,9 +10,6 @@ declare(strict_types=1);
 
 namespace Micro\Http;
 
-use \Micro\Http;
-use \Micro\Exception;
-
 class Response
 {
     /**
@@ -129,7 +126,7 @@ class Response
     public function setCode(int $code): Response
     {
         if (!array_key_exists($code, Http::STATUS_CODES)) {
-            throw new Exception\InvalidArgument('invalid http code set');
+            throw new Exception('invalid http code set');
         }
         
         $this->code = $code;

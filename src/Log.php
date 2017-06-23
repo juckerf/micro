@@ -16,6 +16,7 @@ use \Psr\Log\LoggerInterface;
 use \Micro\Log\Adapter\AbstractAdapter;
 use \Micro\Log\Adapter\AdapterInterface;
 use \Micro\Config;
+use \Micro\Log\Exception;
 
 class Log extends AbstractLogger implements LoggerInterface
 {
@@ -95,12 +96,12 @@ class Log extends AbstractLogger implements LoggerInterface
     public function addAdapter(string $name, string $class, ?Iterable $config=null): AdapterInterface
     {
         if(isset($this->adapter[$name])) {
-            throw new Exception\InvalidArgument('log adapter '.$name.' is already registered');
+            throw new Exception('log adapter '.$name.' is already registered');
         }
             
         $adapter = new $class($config);
         if(!($adapter instanceof AdapterInterface)) {
-            throw new Exception\InvalidArgument('log adapter must include AdapterInterface interface');
+            throw new Exception('log adapter must include AdapterInterface interface');
         }
         $this->adapter[$name] = $adapter;
         return $adapter;
@@ -159,7 +160,7 @@ class Log extends AbstractLogger implements LoggerInterface
     public function log($level, $message, array $context=[]): bool
     {
         if (!array_key_exists($level, self::PRIORITIES)) {
-            throw new Exception\InvalidArgument('log level '.$level.' is unkown');
+            throw new Exception('log level '.$level.' is unkown');
         }
 
         foreach ($this->adapter as $adapter) {

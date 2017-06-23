@@ -10,7 +10,7 @@ declare(strict_types=1);
 
 namespace Micro;
 
-use \Micro\Exception;
+use \Micro\Ldap\Exception;
 use \Psr\Log\LoggerInterface as Logger;
 
 class Ldap

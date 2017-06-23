@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace Micro\Log\Adapter;
 
-use \Micro\Exception;
-
 interface AdapterInterface
 {
     /**

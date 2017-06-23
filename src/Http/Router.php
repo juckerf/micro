@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace Micro\Http;
 
-use \Micro\Exception;
 use \Micro\Helper;
 use \Psr\Log\LoggerInterface as Logger;
 use \Micro\Http\Router\Route;
@@ -215,7 +214,7 @@ class Router
             }
             
             if ($match === false) {
-                throw new Exception\InvalidArgument($this->verb.' '.$this->path.' could not be routed, no matching routes found');
+                throw new Exception($this->verb.' '.$this->path.' could not be routed, no matching routes found');
             } else {
                 if ($response instanceof Response) {
                     $this->logger->info('send http response ['.$response->getCode().']', [
@@ -292,7 +291,7 @@ class Router
                     }
                 }
                 if ($json_params === null) {
-                    throw new Exception\InvalidArgument('invalid json input given');
+                    throw new Exception('invalid json input given');
                 }
 
                 $request_params = array_merge($json_params, $parsed_params);
@@ -324,13 +323,13 @@ class Router
                 }
 
                 if ($return[$param->name] === null && $optional === false) {
-                    throw new Exception\InvalidArgument('misssing required parameter '.$param->name);
+                    throw new Exception('misssing required parameter '.$param->name);
                 }
             }
             
             return $return;
         } catch (ReflectionException $e) {
-            throw new Exception\InvalidArgument('misssing or invalid required request parameter');
+            throw new Exception('misssing or invalid required request parameter');
         }
     }
 }

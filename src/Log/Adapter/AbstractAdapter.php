@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Micro\Log\Adapter;
 
+use \Micro\Log\Exception;
+
 abstract class AbstractAdapter implements AdapterInterface
 {
     /**
@@ -108,7 +110,7 @@ abstract class AbstractAdapter implements AdapterInterface
                
                 case 'level':
                     if(!is_numeric($val)) {
-                        throw new Exception\InvalidArgument('log level must be a number');
+                        throw new Exception('log level must be a number');
                     }
 
                     $this->level = (int)$val;
