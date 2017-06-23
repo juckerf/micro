@@ -21,8 +21,8 @@
         "psr/log": "1.*"
     },
     "suggest": {
-        "ext-ldap": "required if you want to use \Micro\Config\Xml",
-        "ext-xml": "required if you want to use \Micro\Ldap"
+        "ext-xml": "required if you want to use \\Micro\\Config\\Xml",
+        "ext-ldap": "required if you want to use \\Micro\\Ldap"
     },
     "require-dev": {
         "phpunit/phpunit": "5.7.*"
