@@ -2,4 +2,4 @@ language: php
 php:
   - '7.1'
 sudo: false
-script: phpunit tests/
+script: phpunit --bootstrap tests/Bootstrap.php  tests/
