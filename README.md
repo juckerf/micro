@@ -28,10 +28,10 @@ And your actual XML configuration would look like:
   </production>
 </config>
 ```
-Every configuration got configuration environement, if you only have one, just stick with <production> as your first node within <config/>. See environements for further information.
+Every configuration got configuration environment, if you only have one, just stick with <production> as your first node within <config/>. See environments for further information.
 
 
-#### Merge 
+#### Merge
 Merge multiple configuration files:
 ```php
 $config1 = new \Micro\Config\Xml($path);
@@ -40,8 +40,8 @@ $config1->merge($config2);
 $config = new \Micro\Config($config1);
 ```
 
-#### Environements
-You can request a custom configuration environement:
+#### Environments
+You can request a custom configuration environment:
 ```php
 $config = new \Micro\Config(new \Micro\Config\Xml($path, 'development'));
 var_dump($config->myconfigentry);
@@ -61,7 +61,7 @@ While your XML configuration would look like:
 ```
 
 #### Inheritance
-The configuration parser supports inheritance. A simple example would be to just inherit one environement from another:
+The configuration parser supports inheritance. A simple example would be to just inherit one environment from another:
 ```xml
 <config version="1.0">
   <production>
@@ -78,7 +78,7 @@ var_dump($config->a);
 string(1) "a"
 ```
 
-You can also inherit single elements (recursively) within one environement and overwrite elements which were inherit in the first place:
+You can also inherit single elements (recursively) within one environment and overwrite elements which were inherit in the first place:
 ```xml
 <config version="1.0">
   <production>
@@ -233,7 +233,7 @@ $router = new \Micro\Http\Router(array $server, \Psr\Log\LoggerInterface $logger
 
 ```php
 $router = (new \Micro\Http\Router($_SERVER, $logger))
-  ->clearRoutingTable() 
+  ->clearRoutingTable()
   ->addRoute(new \Micro\Http\Router\Route('/api/v1/user', 'MyApp\Rest\v1\User'))
   ->addRoute(new \Micro\Http\Router\Route('/api/v1/user/{uid:#([0-9a-z]{24})#}', 'MyApp\Rest\v1\User'))
   ->addRoute(new \Micro\Http\Router\Route('/api/v1$', 'MyApp\Rest\v1\Rest'))
@@ -249,7 +249,7 @@ Given the routing table above and the following final controller class:
 ```php
 namespace MyApp\Rest\v1;
 
-class User 
+class User
 {
     /**
      * GET http://localhost/api/v1/user/540f1fc9a641e6eb708b4618/attributes
@@ -257,7 +257,7 @@ class User
      */
     public function getAttributes(string $uid=null): \Micro\Http\Response
     {
-            
+
     }
 
     /**
@@ -266,7 +266,7 @@ class User
      */
     public function get(string $uid=null): \Micro\Http\Response
     {
-            
+
     }
 
     /**
@@ -276,16 +276,16 @@ class User
      */
     public function postPassword(string $uid, string $password): \Micro\Http\Response
     {
-            
+
     }
-    
+
     /**
      * DELETE http://localhost/api/v1/user/540f1fc9a641e6eb708b4618/mail
      * DELETE http://localhost/api/v1/user/mail?uid=540f1fc9a641e6eb708b4618
      */
     public function deleteMail(string $uid=null): \Micro\Http\Response
     {
-            
+
     }
 
     /**
@@ -294,7 +294,7 @@ class User
      */
     public function delete(string $uid=null): \Micro\Http\Response
     {
-            
+
     }
 
     /**
@@ -303,7 +303,7 @@ class User
      */
     public function headExists(string $uid=null): \Micro\Http\Response
     {
-            
+
     }
 }
 ```
