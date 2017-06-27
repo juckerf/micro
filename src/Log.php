@@ -67,7 +67,7 @@ class Log extends AbstractLogger implements LoggerInterface
      * Set options
      *
      * @param  Iterable $config
-     * @return Logger
+     * @return Log
      */
     public function setOptions(?Iterable $config=null)
     {
@@ -181,9 +181,9 @@ class Log extends AbstractLogger implements LoggerInterface
      *
      * @param  string $name
      * @param  string $value
-     * @return Logger
+     * @return Log
      */
-    public function addContext(string $name, string $value): Logger
+    public function addContext(string $name, string $value): Log
     {
         $this->context[$name] = $value;
         return $this;
