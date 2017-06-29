@@ -86,7 +86,19 @@ class Log extends AbstractLogger implements LoggerInterface
 
 
     /**
-     * Add datatype
+     * Has adapter
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function hasAdapter(string $name): bool
+    {
+        return isset($this->adapter[$name]);
+    }
+
+
+    /**
+     * Add adapter
      *
      * @param  string $name
      * @param  string $class
@@ -95,7 +107,7 @@ class Log extends AbstractLogger implements LoggerInterface
      */
     public function addAdapter(string $name, string $class, ?Iterable $config=null): AdapterInterface
     {
-        if(isset($this->adapter[$name])) {
+        if($this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is already registered');
         }
             
@@ -116,7 +128,7 @@ class Log extends AbstractLogger implements LoggerInterface
      */
     public function getAdapter(string $name): AdapterInterface
     {
-        if(!isset($this->adapter[$name])) {
+        if(!$this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is not registered');
         }
 
@@ -137,7 +149,7 @@ class Log extends AbstractLogger implements LoggerInterface
         } else {
             $list = [];
             foreach($adapter as $name) {
-                if(!isset($this->adapter[$name])) {
+                if(!$this->hasAdapter($name)) {
                     throw new Exception('log adapter '.$name.' is not registered');
                 }
                 $list[$name] = $this->adapter[$name];
