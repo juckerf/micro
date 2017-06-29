@@ -39,6 +39,7 @@ class File extends AbstractAdapter
         parent::setOptions($config);
 
         if ($config === null) {
+            $this->resource = fopen($this->file, 'a');
             return $this;
         }
 
@@ -46,11 +47,11 @@ class File extends AbstractAdapter
             switch ($attr) {
                 case 'file':
                     $this->file = str_replace('APPLICATION_PATH', APPLICATION_PATH, (string)$val);
-                    $this->resource = fopen($this->file, 'a');
                 break;
             }
         }
 
+        $this->resource = fopen($this->file, 'a');
         return $this;
     }
 
@@ -64,6 +65,10 @@ class File extends AbstractAdapter
      */
     public function log(string $priority, string $message): bool
     {
+        if(!is_resource($this->resource)) {
+            return false;
+        }
+
         $result = fwrite($this->resource, $message."\n");
         return (bool)$result;
     }
