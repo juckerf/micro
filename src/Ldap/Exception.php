@@ -8,8 +8,8 @@ declare(strict_types=1);
  * @license   MIT https://opensource.org/licenses/MIT
  */
 
-namespace Mico\Ldap;
+namespace Micro\Ldap;
 
-class Exception extends \Mico\Exception
+class Exception extends \Micro\Exception
 {
 }

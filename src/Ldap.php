@@ -106,7 +106,7 @@ class Ldap
             ]);
         }
         
-        if($this->tls === false || substr($this->uri, 0, 5) !== 'ldaps') {
+        if($this->tls === false && substr($this->uri, 0, 5) !== 'ldaps') {
             $this->logger->warning('neither tls nor ldaps enabled for ldap connection, it is strongly reccommended to encrypt ldap connections', [
                 'category' => get_class($this),
             ]);
