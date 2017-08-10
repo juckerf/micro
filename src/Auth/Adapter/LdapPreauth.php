@@ -2,9 +2,8 @@
 declare(strict_types=1);
 
 /**
- * Balloon
+ * Micro
  *
- * @author      Raffael Sahli <sahli@gyselroth.net>
  * @copyright   Copryright (c) 2012-2017 gyselroth GmbH (https://gyselroth.com)
  * @license     GPLv3 https://opensource.org/licenses/GPL-3.0
  */
@@ -12,7 +11,7 @@ declare(strict_types=1);
 namespace Micro\Auth\Adapter;
 
 use \Micro\Auth\Exception;
-use \Balloon\Auth\Adapter\Basic\Ldap;
+use \Micro\Auth\Adapter\Basic\Ldap;
 use \Micro\Ldap as LdapServer;
 
 class LdapPreauth extends Ldap

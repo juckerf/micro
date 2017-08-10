@@ -159,7 +159,6 @@ class Log extends AbstractLogger implements LoggerInterface
         }
     }
 
-
     
     /**
      * Log message
