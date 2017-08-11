@@ -19,6 +19,14 @@ use \Micro\Auth\Adapter\AbstractAdapter;
 abstract class AbstractBasic extends AbstractAdapter
 {
     /**
+     * Attributes
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
+
+    /**
      * Authenticate
      *
      * @return bool
@@ -73,7 +81,7 @@ abstract class AbstractBasic extends AbstractAdapter
 
             return false;
         }
-        
+
         if (!isset($result['password']) || empty($result['password'])) {
             $this->logger->info('found no password for ['.$username.'] in database', [
                 'category' => get_class($this)
@@ -90,6 +98,7 @@ abstract class AbstractBasic extends AbstractAdapter
             return false;
         }
 
+        $this->attributes = $result;        
         $this->identifier = $username;
         return true;
     }
@@ -101,5 +110,16 @@ abstract class AbstractBasic extends AbstractAdapter
      * @param  string $username
      * @return array
      */
-    protected abstract function findIdentity(string $username): ? array;
+    protected abstract function findIdentity(string $username): ?array;
+
+
+    /**
+     * Get attributes
+     * 
+     * @return array
+     */
+    public function getAttributes(): array 
+    {
+        return $this->attributes;
+    }
 }

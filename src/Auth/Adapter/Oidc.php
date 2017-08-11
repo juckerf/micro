@@ -72,7 +72,7 @@ class Oidc extends AbstractAdapter
                     'category' => get_class($this)
                 ]);
                 
-                return $this->tokenAuth($parts[1]);
+                return $this->verifyToken($parts[1]);
             } else {
                 $this->logger->debug('http authorization header contains no bearer string or invalid authentication string', [
                     'category' => get_class($this)

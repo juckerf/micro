@@ -41,7 +41,15 @@ abstract class AbstractAdapter implements AdapterInterface
    
 
     /**
-     * Ldap connect
+     * Logger
+     *
+     * @var Logger
+     */
+    protected $logger;
+
+
+    /**
+     * Init adapter
      *
      * @param   Iterable $config
      * @param   Logger $logger

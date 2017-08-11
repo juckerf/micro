@@ -128,8 +128,6 @@ class Stdout extends AbstractAdapter
             break;
         }
         
-        //write to STDOUT does not work with threads
-        //$result = fwrite(STDOUT, $message."\n");
         echo $message."\n";
         return true;
     }

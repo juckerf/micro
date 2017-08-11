@@ -65,7 +65,6 @@ class AttributeMap
     public function map(array $data): array
     {
         $attrs = [];
-
         foreach ($this->map as $attr => $value) {
             if (array_key_exists($value['attr'], $data)) {
                 $this->logger->info('found attribut mapping ['.$attr.'] => [('.$value['type'].') '.$value['attr'].']', [
@@ -75,30 +74,29 @@ class AttributeMap
                 if ($value['type'] == 'array') {
                     $store = $data[$value['attr']];
                 } else {
-                    if (is_array($data[$value['attr']])) {
-                        $store = $data[$value['attr']][0];
-                    } else {
-                        $store = $data[$value['attr']];
+                    $store = $data[$value['attr']];
+                    if (is_array($store) {
+                        $store = $store[0];
                     }
                 }
 
                 switch ($value['type']) {
                     case 'array':
-                         $arr =  (array)$data[$value['attr']];
-                            unset($arr['count']);
-                            $attrs[$attr] = $arr;
+                        $arr =  (array)$data[$value['attr']];
+                        unset($arr['count']);
+                        $attrs[$attr] = $arr;
                     break;
                         
                     case 'string':
-                         $attrs[$attr]  = (string)$store;
+                         $attrs[$attr] = (string)$store;
                     break;
                                             
                     case 'int':
-                         $attrs[$attr]  = (int)$store;
+                         $attrs[$attr] = (int)$store;
                     break;
                                             
                     case 'bool':
-                         $attrs[$attr]  = (bool)$store;
+                         $attrs[$attr] = (bool)$store;
                     break;
                     
                     default:
