@@ -75,7 +75,7 @@ class AttributeMap
                     $store = $data[$value['attr']];
                 } else {
                     $store = $data[$value['attr']];
-                    if (is_array($store) {
+                    if (is_array($store)) {
                         $store = $store[0];
                     }
                 }
