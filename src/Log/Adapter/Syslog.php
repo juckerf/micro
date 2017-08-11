@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -39,10 +39,9 @@ class Syslog extends AbstractAdapter
     /**
      * Set options
      *
-     * @param   Iterable $options
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null)
+    public function setOptions(? Iterable $config = null)
     {
         parent::setOptions($options);
 

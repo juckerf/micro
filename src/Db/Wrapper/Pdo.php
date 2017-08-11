@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -78,7 +78,7 @@ class Pdo
      * @param   Iterable $config
      * @param   Logger   $logger
      */
-    public function __construct(?Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, Logger $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -93,7 +93,7 @@ class Pdo
     public function connect(): Pdo
     {
         $this->connection = new PdoServer($this->dsn, $this->username, $this->password, $this->options);
-        $this->logger->info('connection to db server [' . $this->dsn . '] using pdo was succesful', [
+        $this->logger->info('connection to db server ['.$this->dsn.'] using pdo was succesful', [
             'category' => get_class($this),
         ]);
 
@@ -105,10 +105,10 @@ class Pdo
      * Forward calls
      *
      * @param  array $method
-     * @param  array $argumnets
+     * @param  array $arguments
      * @return mixed
      */
-    public function __call(string $method, array $arguments=[])
+    public function __call(string $method, array $arguments = [])
     {
         return call_user_func_array([&$this->connection, $method], $arguments);
     }
@@ -120,7 +120,7 @@ class Pdo
      * @param  Iterable $config
      * @return Pdo
      */
-    public function setOptions(?Iterable $config = null): Pdo
+    public function setOptions(? Iterable $config = null) : Pdo
     {
         if ($config === null) {
             return $this;
@@ -138,7 +138,7 @@ class Pdo
                     $this->password = (string)$value;
                     break;
                 case 'options':
-                    foreach($value as $opt => $val) {
+                    foreach ($value as $opt => $val) {
                         $this->options[$opt] = (string)$val;
                     }
                     break;
@@ -179,7 +179,7 @@ class Pdo
         $link   = $this->getResource();
         $result = $link->query($query);
 
-        if($result === false) {
+        if ($result === false) {
             throw new Exception('failed to execute sql query with error '.$link->errorInfo()[2].' ('.$link->errorCode().')');
         }
 
@@ -202,7 +202,7 @@ class Pdo
         $link   = $this->getResource();
         $result = $link->exec($query);
 
-        if($result === false) {
+        if ($result === false) {
             throw new Exception('failed to execute sql query with error '.$link->errorInfo().' ('.$link->errorCode().')');
         } else {
             $this->logger->debug('sql query affected ['.$result.'] rows', [
@@ -231,12 +231,12 @@ class Pdo
         $link  = $this->getResource();
         $stmt  = $link->prepare($query);
 
-        if(!($stmt instanceof mysqli_stmt)) {
+        if (!($stmt instanceof mysqli_stmt)) {
             throw new Exception('failed to prepare mysql query with error '.$link->error.' ('.$link->errno.')');
         }
 
         $types = '';
-        foreach($values as $attr => $value) {
+        foreach ($values as $attr => $value) {
             $types .= 's';
         }
 

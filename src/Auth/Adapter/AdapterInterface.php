@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -21,7 +21,7 @@ interface AdapterInterface
      * @param   Logger $logger
      * @return  void
      */
-    public function __construct(?Iterable $config, Logger $logger);
+    public function __construct(? Iterable $config, Logger $logger);
 
 
     /**

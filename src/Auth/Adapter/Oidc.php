@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -35,13 +35,13 @@ class Oidc extends AbstractAdapter
      * @param   Iterable $config
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface
+    public function setOptions(? Iterable $config = null) : AdapterInterface
     {
         if ($config === null) {
             return $this;
         }
 
-        if(isset($config['provider_url'])) {
+        if (isset($config['provider_url'])) {
             $this->discovery_url = (string)$config['provider_url'];
         }
 
@@ -101,7 +101,7 @@ class Oidc extends AbstractAdapter
      */    
     protected function getDiscoveryDocument(): array
     {
-        if($apc = extension_loaded('apc') && apc_exists($this->provider_url)) {
+        if ($apc = extension_loaded('apc') && apc_exists($this->provider_url)) {
             return apc_get($this->provider_url);
         } else {
             $ch = curl_init();
@@ -111,7 +111,7 @@ class Oidc extends AbstractAdapter
 
             $discovery = json_decode($result, true);
             
-            if($apc === true) {
+            if ($apc === true) {
                 apc_store($this->provider_url, $discovery);
             }
 
@@ -129,7 +129,7 @@ class Oidc extends AbstractAdapter
     protected function verifyToken(string $token): bool
     {
         $discovery = $this->getDiscoverDocument();
-        if(!(isset($discovery['authorization_endpoint']))) {
+        if (!(isset($discovery['authorization_endpoint']))) {
             throw new Exception('authorization_endpoint could not be determained');
         }
 

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -154,7 +154,7 @@ class Response
      * @param  bool $body_only
      * @return Response
      */
-    public function setBody($body, bool $body_only=false): Response
+    public function setBody($body, bool $body_only = false): Response
     {
         $this->body = $body;
         $this->body_only = $body_only;
@@ -165,7 +165,7 @@ class Response
     /**
      * Get body
      *
-     * @return mixed
+     * @return string
      */
     public function getBody()
     {
@@ -182,7 +182,7 @@ class Response
     {
         $this->sendHeaders();
         $status = Http::STATUS_CODES[$this->code];
-        header('HTTP/1.0 ' . $this->code . ' ' . $status, true, $this->code);
+        header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
 
         if ($this->body === null && $this->code == 204) {
             $this->terminate();
@@ -275,13 +275,13 @@ class Response
 
 
     /**
-    * Converts mixed data to XML
-    *
-    * @param    mixed $data
-    * @param    SimpleXMLElement $xml
-    * @param    string $child_name
-    * @return   string
-    */
+     * Converts mixed data to XML
+     *
+     * @param    mixed $data
+     * @param    SimpleXMLElement $xml
+     * @param    string $child_name
+     * @return   string
+     */
     public function toXML($data, Config $xml, string $child_name): string
     {
         if (is_array($data)) {
@@ -340,7 +340,7 @@ class Response
     /**
      * Set the current output format.
      *
-     * @param  string $foramt a key of $outputForms
+     * @param  string $format a key of $outputForms
      * @return Response
      */
     public function setOutputFormat(string $format): Response

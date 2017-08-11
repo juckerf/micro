@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -40,7 +40,7 @@ class Config implements ArrayAccess, Iterator, Countable
      * @param   string $config
      * @return  void
      */
-    public function __construct($config=[])
+    public function __construct($config = [])
     {
         if ($config instanceof ConfigInterface) {
             $this->store = $config->map();

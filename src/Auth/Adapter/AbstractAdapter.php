@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -47,7 +47,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param   Logger $logger
      * @return  void
      */
-    public function __construct(?Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, Logger $logger)
     {
         $this->logger = $logger;
         $this->setOptions($config);
@@ -71,7 +71,7 @@ abstract class AbstractAdapter implements AdapterInterface
      * @param   Iterable $config
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface
+    public function setOptions(? Iterable $config = null) : AdapterInterface
     {
         if ($config === null) {
             return $this;

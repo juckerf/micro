@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -65,7 +65,7 @@ class Auth
      * @param   Logger $logger
      * @return  void
      */
-    public function __construct(?Iterable $config=null, Logger $logger)
+    public function __construct(? Iterable $config = null, Logger $logger)
     {
         $this->logger = $logger;
         $this->setOptions($config);
@@ -76,29 +76,29 @@ class Auth
      * Set options
      *
      * @param  Iterable $config
-     * @return Log
+     * @return Auth
      */
-    public function setOptions(?Iterable $config=null): Auth
+    public function setOptions(? Iterable $config = null) : Auth
     {
-        if($config === null) {
+        if ($config === null) {
             return $this;
         }
 
-        foreach($config as $option => $value) {
-            switch($option) {
+        foreach ($config as $option => $value) {
+            switch ($option) {
                 case 'identity_class': 
                 case 'attribute_map_class': 
                     $this->{$option} = (string)$value;
                 break;
 
                 case 'adapter':
-                    foreach($value as $name => $adapter) {
-                        if(!isset($adapter['enabled']) || $adapter['enabled'] === '1') {
-                            if(!isset($adapter['class'])) {
+                    foreach ($value as $name => $adapter) {
+                        if (!isset($adapter['enabled']) || $adapter['enabled'] === '1') {
+                            if (!isset($adapter['class'])) {
                                 throw new Exception('class option is required');
                             }
                         
-                            if(isset($adapter['config'])) {
+                            if (isset($adapter['config'])) {
                                 $config = $adapter['config'];
                             } else {
                                 $config = null;
@@ -138,14 +138,14 @@ class Auth
      * @param  Iterable $config
      * @return AdapterInterface
      */
-    public function addAdapter(string $name, string $class, ?Iterable $config=null): AdapterInterface
+    public function addAdapter(string $name, string $class, ? Iterable $config = null) : AdapterInterface
     {
-        if($this->hasAdapter($name)) {
+        if ($this->hasAdapter($name)) {
             throw new Exception('auth adapter '.$name.' is already registered');
         }
             
         $adapter = new $class($config, $this->logger);
-        if(!($adapter instanceof AdapterInterface)) {
+        if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('auth adapter must include AdapterInterface interface');
         }
         $this->adapter[$name] = $adapter;
@@ -161,7 +161,7 @@ class Auth
      */
     public function getAdapter(string $name): AdapterInterface
     {
-        if(!$this->hasAdapter($name)) {
+        if (!$this->hasAdapter($name)) {
             throw new Exception('auth adapter '.$name.' is not registered');
         }
 
@@ -175,14 +175,14 @@ class Auth
      * @param  array $adapters
      * @return array
      */
-    public function getAdapters(array $adapters=[]): array
+    public function getAdapters(array $adapters = []): array
     {
-        if(empty($adapter)) {
+        if (empty($adapter)) {
             return $this->adapter;
         } else {
             $list = [];
-            foreach($adapter as $name) {
-                if(!$this->hasAdapter($name)) {
+            foreach ($adapter as $name) {
+                if (!$this->hasAdapter($name)) {
                     throw new Exception('auth adapter '.$name.' is not registered');
                 }
                 $list[$name] = $this->adapter[$name];
@@ -210,14 +210,13 @@ class Auth
     /**
      * Authenticate
      *
-     * @param   Iterable $adapters
      * @return  bool
      */
     public function requireOne(): bool
     {
         $result = false;
         
-        foreach($this->adapter as $name => $adapter) {
+        foreach ($this->adapter as $name => $adapter) {
             try {
                 if ($adapter->authenticate()) {
                     $this->createIdentity($adapter);      
@@ -242,7 +241,7 @@ class Auth
         }
         
         $this->logger->warning("all authentication adapter have failed", [
-           'category' => get_class($this)
+            'category' => get_class($this)
         ]);
 
         return false;
@@ -252,7 +251,7 @@ class Auth
     /**
      * Get identity
      *
-     * @return identity
+     * @return Identity
      */
     public function getIdentity(): Identity
     {
