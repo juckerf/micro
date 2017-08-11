@@ -5,7 +5,7 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/gyselroth/micro.svg)](https://packagist.org/packages/gyselroth/micro)
 
 ## Description
-Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing and some wrapper around databases and ldap.
+Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing, Authentication system and some wrapper around databases and ldap.
 
 ## Requirements
 The library is only >= PHP7.1 compatible.
