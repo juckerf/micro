@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -50,7 +50,7 @@ class Ldap extends AbstractAdapter
      * @param   Logger $logger
      * @return  void
      */
-    public function __construct(?Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, Logger $logger)
     {
         $this->logger = $logger;
         $this->setOptions($config);
@@ -63,7 +63,7 @@ class Ldap extends AbstractAdapter
      * @param   Iterable $config
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface
+    public function setOptions(? Iterable $config = null) : AdapterInterface
     {
         if ($config === null) {
             return $this;
@@ -81,7 +81,7 @@ class Ldap extends AbstractAdapter
             }
         }
         
-        if(!isset($config['ldap'])) {
+        if (!isset($config['ldap'])) {
             $this->ldap = new LdapServer();
         }
 

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -24,10 +24,9 @@ interface AdapterInterface
     /**
      * Create adapter
      *
-     * @param Iterable $options
      * @return void
      */
-    public function __construct(?Iterable $config=null);
+    public function __construct(? Iterable $config = null);
     
 
     /**
@@ -55,8 +54,7 @@ interface AdapterInterface
     /**
      * Set options
      *
-     * @param   Iterable $options
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface;
+    public function setOptions(? Iterable $config = null) : AdapterInterface;
 }

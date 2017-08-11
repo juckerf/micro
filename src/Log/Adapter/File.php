@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -31,10 +31,9 @@ class File extends AbstractAdapter
     /**
      * Set options
      *
-     * @param   Iterable $options
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface
+    public function setOptions(? Iterable $config = null) : AdapterInterface
     {
         parent::setOptions($config);
 
@@ -65,7 +64,7 @@ class File extends AbstractAdapter
      */
     public function log(string $priority, string $message): bool
     {
-        if(!is_resource($this->resource)) {
+        if (!is_resource($this->resource)) {
             return false;
         }
 

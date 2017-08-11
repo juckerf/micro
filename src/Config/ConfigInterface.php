@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -27,7 +27,7 @@ interface ConfigInterface
     /**
      * Get entire simplexml
      *
-     * @return mixed
+     * @return \SimpleXMLElement
      */
     public function getRaw();
 
@@ -36,7 +36,7 @@ interface ConfigInterface
      * Get from config
      *
      * @param   string $name
-     * @return  mixed
+     * @return  \SimpleXMLElement
      */
     public function __get(string $name);
 
@@ -53,8 +53,7 @@ interface ConfigInterface
     /**
      * Get native config format as config instance
      *
-     * @param   mixed $config
      * @return  Config
      */
-    public function map($native=null): Config;
+    public function map($native = null): Config;
 }

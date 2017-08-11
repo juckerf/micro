@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -89,7 +89,7 @@ abstract class AbstractBasic extends AbstractAdapter
             return false;
         }
 
-        $this->identifier  = $username;
+        $this->identifier = $username;
         return true;
     }
 
@@ -100,5 +100,5 @@ abstract class AbstractBasic extends AbstractAdapter
      * @param  string $username
      * @return array
      */
-    protected abstract function findIdentity(string $username): ?array;
+    protected abstract function findIdentity(string $username): ? array;
 }

@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -84,8 +84,8 @@ class AttributeMap
                 switch ($value['type']) {
                     case 'array':
                          $arr =  (array)$data[$value['attr']];
-                          unset($arr['count']);
-                          $attrs[$attr] = $arr;
+                            unset($arr['count']);
+                            $attrs[$attr] = $arr;
                     break;
                         
                     case 'string':

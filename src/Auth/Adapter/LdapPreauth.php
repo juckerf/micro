@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
@@ -36,9 +36,9 @@ class LdapPreauth extends Ldap
      * Set options
      *
      * @param   Iterable $config
-     * @return  LdapServer
+     * @return  LdapPreauth
      */
-    public function setOptions(?Iterable $config=null): LdapServer
+    public function setOptions(? Iterable $config = null) : LdapServer
     {
         if ($config === null) {
             return $this;
@@ -106,7 +106,7 @@ class LdapPreauth extends Ldap
      */
     protected function preauth(string $value): bool
     {
-        $parts   = explode('|', $value);
+        $parts = explode('|', $value);
 
         if (count($parts) !== 2) {
             $this->logger->warning('invalid header x-preauth value, parts != 2', [
@@ -193,7 +193,7 @@ class LdapPreauth extends Ldap
             'category' => get_class($this)
         ]);
 
-        $this->ldap_dn   = $dn;
+        $this->ldap_dn = $dn;
 
         return true;
     }
@@ -218,6 +218,6 @@ class LdapPreauth extends Ldap
         $ip_decimal = ip2long($ip);
         $wildcard_decimal = pow(2, (32 - $netmask)) - 1;
         $netmask_decimal = ~ $wildcard_decimal;
-        return (($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal));
+        return (($ip_decimal&$netmask_decimal) == ($range_decimal&$netmask_decimal));
     }
 }
