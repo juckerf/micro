@@ -12,6 +12,7 @@ declare(strict_types = 1);
 namespace Micro\Http;
 
 use \Micro\Http;
+use \Closure;
 
 class Response
 {
@@ -189,12 +190,16 @@ class Response
             $this->terminate();
         }
         
-        if ($this->body_only === false && $this->output_format !== 'text') {
-            $body = ['data' => $this->body];
-            $body['status'] = intval($this->code);
-            $body = array_reverse($body, true);
+        if($this->body instanceof Closure) {
+            $body = $this->body();
         } else {
             $body = $this->body;
+        }
+            
+        if ($this->body_only === false && $this->output_format !== 'text') {
+            $body = ['data' => $body];
+            $body['status'] = intval($this->code);
+            $body = array_reverse($body, true);
         }
         
         switch ($this->output_format) {
@@ -309,6 +314,7 @@ class Response
      */
     public function asXML($body): string
     {
+        header('Content-Type: application/xml; charset=utf-8');
         $root = new Config('<response></response>');
         $raw = $this->toXML($body, $root, 'node');
         

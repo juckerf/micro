@@ -209,7 +209,7 @@ class Router
                     }
                 } else {
                     $this->logger->debug('requested path ['.$this->path.'] does not match route ['.$route->getPath().']', [
-                            'category' => get_class($this),
+                        'category' => get_class($this),
                     ]);
                 }
             }
