@@ -10,6 +10,11 @@
 ## Description
 Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing, Authentication system and some wrapper around databases and ldap.
 
+* \Micro\Auth
+* \Micro\Config
+* \Micro\Http
+* \Micro\Log
+
 ## Requirements
 The library is only >= PHP7.1 compatible.
 
