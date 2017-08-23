@@ -1,6 +1,6 @@
 {
     "name": "gyselroth/micro",
-    "description": "\Micro PHP library",
+    "description": "Micro PHP library",
     "keywords": ["micro", "simple", "php", "lib", "framework"],
     "homepage": "http://www.github.com/gyselroth/micro",
     "license": "MIT",
