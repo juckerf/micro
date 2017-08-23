@@ -4,6 +4,7 @@
     "keywords": ["micro", "simple", "php", "lib", "framework"],
     "homepage": "http://www.github.com/gyselroth/micro",
     "license": "MIT",
+    "version": "0.0.1",
     "authors": [
         {
             "name": "Raffael Sahli",
