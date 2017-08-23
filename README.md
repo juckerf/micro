@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/gyselroth/micro.svg?branch=master)](https://travis-ci.org/gyselroth/micro)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/micro/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/micro/?branch=master)
 [![Latest Stable Version](https://img.shields.io/packagist/v/gyselroth/micro.svg)](https://packagist.org/packages/gyselroth/micro)
+[![GitHub release](https://img.shields.io/github/release/gyselroth/micro.svg)](https://github.com/gyselroth/micro/releases)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gyselroth/micro/master/LICENSE)
 
 ## Description
@@ -10,6 +11,14 @@ Micro provides minimalistic core features to write a new Application. Instead pr
 
 ## Requirements
 The library is only >= PHP7.1 compatible.
+
+## Download
+The package is available at packagst: https://packagist.org/packages/gyselroth/micro
+
+To install the package via composer execute:
+```
+composer require gyselroth/micro
+```
 
 ## Configuration (\Micro\Config)
 
