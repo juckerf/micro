@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/gyselroth/micro.svg?branch=master)](https://travis-ci.org/gyselroth/micro)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/micro/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/micro/?branch=master)
 [![Latest Stable Version](https://img.shields.io/packagist/v/gyselroth/micro.svg)](https://packagist.org/packages/gyselroth/micro)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gyselroth/micro/master/LICENSE)
 
 ## Description
 Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing, Authentication system and some wrapper around databases and ldap.
