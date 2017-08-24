@@ -8,7 +8,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gyselroth/micro/master/LICENSE)
 
 ## Description
-Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing, Authentication system and some wrapper around databases and ldap.
+Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of namespaces. It comes with a logger (and multiple adapters), configuration parser, HTTP routing/response, Authentication (and multiple adapters) and some wrapper around databases and ldap.
 
 * \Micro\Auth
 * \Micro\Config
@@ -19,7 +19,7 @@ Micro provides minimalistic core features to write a new Application. Instead pr
 The library is only >= PHP7.1 compatible.
 
 ## Download
-The package is available at packagst: https://packagist.org/packages/gyselroth/micro
+The package is available at packagist: https://packagist.org/packages/gyselroth/micro
 
 To install the package via composer execute:
 ```
