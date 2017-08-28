@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -11,6 +12,7 @@ declare(strict_types=1);
 namespace Micro\Http;
 
 use \Micro\Http;
+use \Closure;
 
 class Response
 {
@@ -154,7 +156,7 @@ class Response
      * @param  bool $body_only
      * @return Response
      */
-    public function setBody($body, bool $body_only=false): Response
+    public function setBody($body, bool $body_only = false): Response
     {
         $this->body = $body;
         $this->body_only = $body_only;
@@ -165,7 +167,7 @@ class Response
     /**
      * Get body
      *
-     * @return mixed
+     * @return string
      */
     public function getBody()
     {
@@ -182,18 +184,22 @@ class Response
     {
         $this->sendHeaders();
         $status = Http::STATUS_CODES[$this->code];
-        header('HTTP/1.0 ' . $this->code . ' ' . $status, true, $this->code);
+        header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
 
         if ($this->body === null && $this->code == 204) {
             $this->terminate();
         }
         
-        if ($this->body_only === false && $this->output_format !== 'text') {
-            $body = ['data' => $this->body];
-            $body['status'] = intval($this->code);
-            $body = array_reverse($body, true);
+        if($this->body instanceof Closure) {
+            $body = $this->body();
         } else {
             $body = $this->body;
+        }
+            
+        if ($this->body_only === false && $this->output_format !== 'text') {
+            $body = ['data' => $body];
+            $body['status'] = intval($this->code);
+            $body = array_reverse($body, true);
         }
         
         switch ($this->output_format) {
@@ -275,13 +281,13 @@ class Response
 
 
     /**
-    * Converts mixed data to XML
-    *
-    * @param    mixed $data
-    * @param    SimpleXMLElement $xml
-    * @param    string $child_name
-    * @return   string
-    */
+     * Converts mixed data to XML
+     *
+     * @param    mixed $data
+     * @param    SimpleXMLElement $xml
+     * @param    string $child_name
+     * @return   string
+     */
     public function toXML($data, Config $xml, string $child_name): string
     {
         if (is_array($data)) {
@@ -308,6 +314,7 @@ class Response
      */
     public function asXML($body): string
     {
+        header('Content-Type: application/xml; charset=utf-8');
         $root = new Config('<response></response>');
         $raw = $this->toXML($body, $root, 'node');
         
@@ -340,7 +347,7 @@ class Response
     /**
      * Set the current output format.
      *
-     * @param  string $foramt a key of $outputForms
+     * @param  string $format a key of $outputForms
      * @return Response
      */
     public function setOutputFormat(string $format): Response

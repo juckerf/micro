@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -50,10 +51,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Create adapter
      *
-     * @param Iterable $options
      * @return void
      */
-    public function __construct(?Iterable $config=null)
+    public function __construct(? Iterable $config = null)
     {
         $this->setOptions($config);
     }
@@ -93,10 +93,9 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Set options
      *
-     * @param   Iterable $options
      * @return  AdapterInterface
      */
-    public function setOptions(?Iterable $config=null): AdapterInterface
+    public function setOptions(? Iterable $config = null) : AdapterInterface
     {
         if ($config === null) {
             return $this;
@@ -109,7 +108,7 @@ abstract class AbstractAdapter implements AdapterInterface
                 break;
                
                 case 'level':
-                    if(!is_numeric($val)) {
+                    if (!is_numeric($val)) {
                         throw new Exception('log level must be a number');
                     }
 

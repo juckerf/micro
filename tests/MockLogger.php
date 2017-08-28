@@ -7,7 +7,7 @@ class MockLogger extends AbstractLogger
 {
     public $storage = [];
 
-    public function log($level, $message, array $context=[])
+    public function log($level, $message, array $context = [])
     {
         $this->storage[] = [
             'level'     => $level,

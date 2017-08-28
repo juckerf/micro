@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -68,7 +69,7 @@ class Ldap
      *
      * @var bool
      */
-    protected $tls=false;
+    protected $tls = false;
 
 
     /**
@@ -86,7 +87,7 @@ class Ldap
      * @param   Logger $logger
      * @return  resource
      */
-    public function __construct(?Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, Logger $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -100,13 +101,13 @@ class Ldap
      */
     public function connect(): Ldap
     {
-        if($this->binddn === null) {
+        if ($this->binddn === null) {
             $this->logger->warning('no binddn set for ldap connection, you should avoid anonymous bind', [
                 'category' => get_class($this),
             ]);
         }
         
-        if($this->tls === false || substr($this->uri, 0, 5) !== 'ldaps') {
+        if ($this->tls === false && substr($this->uri, 0, 5) !== 'ldaps') {
             $this->logger->warning('neither tls nor ldaps enabled for ldap connection, it is strongly reccommended to encrypt ldap connections', [
                 'category' => get_class($this),
             ]);
@@ -123,7 +124,7 @@ class Ldap
         }
 
         if ($this->connection) {
-            if($this->binddn !== null) {
+            if ($this->binddn !== null) {
                 $bind = ldap_bind($this->connection, $this->binddn, $this->bindpw);
 
                 if ($bind) {
@@ -165,7 +166,7 @@ class Ldap
      * @param  Iterable $config
      * @return Ldap
      */
-    public function setOptions(?Iterable $config=null): Ldap
+    public function setOptions(? Iterable $config = null) : Ldap
     {
         if ($config === null) {
             return $this;

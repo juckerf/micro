@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -30,7 +31,7 @@ class Xml implements ConfigInterface
      * @param   string $env
      * @return  void
      */
-    public function __construct(string $config, string $env='production')
+    public function __construct(string $config, string $env = 'production')
     {
         $config = simplexml_load_file($config);
         if ($this->store === false) {
@@ -49,7 +50,7 @@ class Xml implements ConfigInterface
             while (list(, $node) = each($result)) {
                 $path = (string)$node->attributes()->inherits;
 
-                if($path === '') {
+                if ($path === '') {
                     continue;
                 }
 
@@ -81,15 +82,15 @@ class Xml implements ConfigInterface
     /**
      * Merge xml tree's
      *
-     * @param   SimpleXMLElement $simmplexml_to
+     * @param   SimpleXMLElement $simplexml_to
      * @param   SimpleXMLElement $simplexml_from
      * @param   bool $replace
      * @return  bool
      */
-    protected function appendSimplexml(SimpleXMLElement &$simplexml_to, SimpleXMLElement &$simplexml_from, bool $replace=true): bool
+    protected function appendSimplexml(SimpleXMLElement&$simplexml_to, SimpleXMLElement&$simplexml_from, bool $replace = true): bool
     {
-        if(count($simplexml_from->children()) === 0) {
-            if($replace === true && count($simplexml_to->children()) === 0) {
+        if (count($simplexml_from->children()) === 0) {
+            if ($replace === true && count($simplexml_to->children()) === 0) {
                 $simplexml_to[0] = htmlspecialchars((string)$simplexml_from);
             }
         }
@@ -98,7 +99,7 @@ class Xml implements ConfigInterface
         foreach ($simplexml_from->attributes() as $attr_key => $attr_value) {
             if (!isset($attrs[$attr_key])) {
                 $simplexml_to->addAttribute($attr_key, (string)$attr_value);
-            } elseif($replace===true) {
+            } elseif ($replace === true) {
                 $simplexml_to->attributes()->{$attr_key} = (string)$attr_value;
             }
         }
@@ -108,7 +109,7 @@ class Xml implements ConfigInterface
                 if (!isset($simplexml_to->{$simplexml_child->getName()})) {
                     $simplexml_to->addChild($simplexml_child->getName(), htmlspecialchars((string)$simplexml_child));
                 } elseif($replace === true && count($simplexml_to->{$simplexml_child->getName()}->children()) === 0) {
-                   $simplexml_to->{$simplexml_child->getName()} = htmlspecialchars((string)$simplexml_child);
+                    $simplexml_to->{$simplexml_child->getName()} = htmlspecialchars((string)$simplexml_child);
                 }
             } else {
                 $this->appendSimplexml($simplexml_to->{$simplexml_child->getName()}, $simplexml_child, $replace);
@@ -118,7 +119,7 @@ class Xml implements ConfigInterface
             foreach ($simplexml_child->attributes() as $attr_key => $attr_value) {
                 if (!isset($attrs[$attr_key])) {
                     $simplexml_to->{$simplexml_child->getName()}->addAttribute($attr_key, (string)$attr_value);
-                } elseif($replace===true) {
+                } elseif ($replace === true) {
                     $simplexml_to->{$simplexml_child->getName()}->attributes()->{$attr_key} = (string)$attr_value;
                 }
             }
@@ -155,9 +156,9 @@ class Xml implements ConfigInterface
      * Add config tree and merge it
      *
      * @param   ConfigInterface $config
-     * @return  Xml
+     * @return  ConfigInterface
      */
-    public function merge($config): Xml
+    public function merge($config): ConfigInterface
     {
         $merge = $config->getRaw();
         $this->appendSimplexml($this->store, $merge);
@@ -166,7 +167,7 @@ class Xml implements ConfigInterface
         while (list(, $node) = each($result)) {
             $path = (string)$node->attributes()->reference;
             
-            if($path === '') {
+            if ($path === '') {
                 continue;
             }
 
@@ -190,7 +191,7 @@ class Xml implements ConfigInterface
      * @param   SimpleXMLElement $xml
      * @return  Config
      */
-    public function map($xml=null): Config
+    public function map($xml = null): Config
     {
         if ($xml === null) {
             $xml = $this->store;
@@ -200,10 +201,10 @@ class Xml implements ConfigInterface
         foreach ($xml->getNamespaces() + array(null) as $prefix => $namespace) {
             foreach ($xml->attributes($namespace) as $key => $value) {
                 if (is_string($prefix)) {
-                    $key = $prefix . '.' . $key;
+                    $key = $prefix.'.'.$key;
                 }
 
-                if($key === 'reference') {
+                if ($key === 'reference') {
                     continue;
                 }
 
@@ -217,13 +218,13 @@ class Xml implements ConfigInterface
                 if (!isset($arr[$name])) {
                     $config[$name] = $value;
                 } else {
-                    foreach ((array) $value as $k => $v) {
+                    foreach ((array)$value as $k => $v) {
                         if (is_numeric($k)) {
                             $config[$name][] = $v;
                         } else {
                             $config[$name][$k] = array_merge(
-                                (array) $config[$name][$k],
-                                (array) $v
+                                (array)$config[$name][$k],
+                                (array)$v
                             );
                         }
                     }
@@ -232,7 +233,7 @@ class Xml implements ConfigInterface
                 $config[$name] = new Config();
             }
         }
-        if ($content = trim((string) $xml)) {
+        if ($content = trim((string)$xml)) {
             $config[] = $content;
         }
 

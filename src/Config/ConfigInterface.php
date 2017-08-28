@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -25,7 +26,7 @@ interface ConfigInterface
 
 
     /**
-     * Get entire simplexml
+     * Get raw format
      *
      * @return mixed
      */
@@ -47,14 +48,13 @@ interface ConfigInterface
      * @param   mixed $config
      * @return  ConfigInterface
      */
-    public function merge($config);
+    public function merge($config): ConfigInterface;
 
 
     /**
      * Get native config format as config instance
      *
-     * @param   mixed $config
      * @return  Config
      */
-    public function map($native=null): Config;
+    public function map($native = null): Config;
 }

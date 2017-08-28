@@ -1,14 +1,30 @@
-# Micro (Yet another PHP Framework)
+# Micro (Yet another PHP library)
+...but no shit
 
 [![Build Status](https://travis-ci.org/gyselroth/micro.svg?branch=master)](https://travis-ci.org/gyselroth/micro)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/micro/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/micro/?branch=master)
 [![Latest Stable Version](https://img.shields.io/packagist/v/gyselroth/micro.svg)](https://packagist.org/packages/gyselroth/micro)
+[![GitHub release](https://img.shields.io/github/release/gyselroth/micro.svg)](https://github.com/gyselroth/micro/releases)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/gyselroth/micro/master/LICENSE)
 
 ## Description
-Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of classes. It comes with a logger, configuration parser, HTTP routing and some wrapper around databases and ldap.
+Micro provides minimalistic core features to write a new Application. Instead providing a rich featured fatty library it only provides a couple of namespaces. It comes with a logger (and multiple adapters), configuration parser, HTTP routing/response, Authentication (and multiple adapters) and some wrapper around databases and ldap.
+
+* \Micro\Auth
+* \Micro\Config
+* \Micro\Http
+* \Micro\Log
 
 ## Requirements
 The library is only >= PHP7.1 compatible.
+
+## Download
+The package is available at packagist: https://packagist.org/packages/gyselroth/micro
+
+To install the package via composer execute:
+```
+composer require gyselroth/micro
+```
 
 ## Configuration (\Micro\Config)
 

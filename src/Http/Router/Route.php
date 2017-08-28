@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -67,12 +68,12 @@ class Route
      * Instance route
      *
      * @param   string $path
-     * @param   string|object $class
+     * @param   string $class
      * @param   string $method
      * @param   array $params
      * @return  void
      */
-    public function __construct(string $path, $class, ?string $method=null, array $params=[])
+    public function __construct(string $path, $class, ? string $method = null, array $params = [])
     {
         $this->setPath($path);
         $this->setClass($class);
@@ -88,7 +89,7 @@ class Route
      */
     public function match(): bool
     {
-        $regex = preg_replace_callback('#({([A-Z0-9a-z]+)\:\#(.+?)\#})|\{(.+?)\}#', function ($match) {
+        $regex = preg_replace_callback('#({([A-Z0-9a-z]+)\:\#(.+?)\#})|\{(.+?)\}#', function($match) {
             if (count($match) === 4) {
                 return '(?<'.$match[2].'>'.$match[3].'+)';
             } else {
@@ -117,7 +118,7 @@ class Route
      * @param  array $constructor
      * @return array
      */
-    public function getCallable($constructor=[]): array
+    public function getCallable($constructor = []): array
     {
         if (is_object($this->class)) {
             $instance = $this->class;
@@ -139,7 +140,7 @@ class Route
      * @param   string $name
      * @return  string
      */
-    protected function _buildMethodName(?string $name): string
+    protected function _buildMethodName(? string $name) : string
     {
         $result = $this->router->getVerb();
         
@@ -264,7 +265,7 @@ class Route
      * @param   string $method
      * @return  Route
      */
-    public function setMethod(?string $method): Route
+    public function setMethod(? string $method) : Route
     {
         $this->method = $method;
         return $this;
@@ -312,7 +313,7 @@ class Route
      * @param  bool $next
      * @return Route
      */
-    public function continuePropagation($next=true): Route
+    public function continuePropagation($next = true): Route
     {
         $this->continue_propagation = (bool)$next;
         return $this;

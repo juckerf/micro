@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -40,7 +41,7 @@ class Config implements ArrayAccess, Iterator, Countable
      * @param   string $config
      * @return  void
      */
-    public function __construct($config=[])
+    public function __construct($config = [])
     {
         if ($config instanceof ConfigInterface) {
             $this->store = $config->map();

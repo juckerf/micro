@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -57,7 +58,7 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param   Iterable $config
      * @return  void
      */
-    public function __construct(?Iterable $config=null)
+    public function __construct(? Iterable $config = null)
     {
         $this->setOptions($config);
     }
@@ -67,16 +68,16 @@ class Log extends AbstractLogger implements LoggerInterface
      * Set options
      *
      * @param  Iterable $config
-     * @return Logger
+     * @return Log
      */
-    public function setOptions(?Iterable $config=null)
+    public function setOptions(? Iterable $config = null)
     {
-        if($config === null) {
+        if ($config === null) {
             return $this;
         }
 
-        foreach($config as $option => $value) {
-            if(!isset($value['enabled']) || $value['enabled'] === '1') {
+        foreach ($config as $option => $value) {
+            if (!isset($value['enabled']) || $value['enabled'] === '1') {
                 $this->addAdapter($option, $value['class'], $value['config']);
             }
         }
@@ -86,21 +87,33 @@ class Log extends AbstractLogger implements LoggerInterface
 
 
     /**
-     * Add datatype
+     * Has adapter
+     *
+     * @param  string $name
+     * @return bool
+     */
+    public function hasAdapter(string $name): bool
+    {
+        return isset($this->adapter[$name]);
+    }
+
+
+    /**
+     * Add adapter
      *
      * @param  string $name
      * @param  string $class
      * @param  Iterable $config
      * @return AdapterInterface
      */
-    public function addAdapter(string $name, string $class, ?Iterable $config=null): AdapterInterface
+    public function addAdapter(string $name, string $class, ? Iterable $config = null) : AdapterInterface
     {
-        if(isset($this->adapter[$name])) {
+        if ($this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is already registered');
         }
             
         $adapter = new $class($config);
-        if(!($adapter instanceof AdapterInterface)) {
+        if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('log adapter must include AdapterInterface interface');
         }
         $this->adapter[$name] = $adapter;
@@ -116,7 +129,7 @@ class Log extends AbstractLogger implements LoggerInterface
      */
     public function getAdapter(string $name): AdapterInterface
     {
-        if(!isset($this->adapter[$name])) {
+        if (!$this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is not registered');
         }
 
@@ -130,14 +143,14 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param  array $adapters
      * @return array
      */
-    public function getAdapters(array $adapters=[]): array
+    public function getAdapters(array $adapters = []): array
     {
-        if(empty($adapter)) {
+        if (empty($adapter)) {
             return $this->adapter;
         } else {
             $list = [];
-            foreach($adapter as $name) {
-                if(!isset($this->adapter[$name])) {
+            foreach ($adapter as $name) {
+                if (!$this->hasAdapter($name)) {
                     throw new Exception('log adapter '.$name.' is not registered');
                 }
                 $list[$name] = $this->adapter[$name];
@@ -146,7 +159,6 @@ class Log extends AbstractLogger implements LoggerInterface
             return $list;
         }
     }
-
 
     
     /**
@@ -157,7 +169,7 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param   array $context
      * @return  bool
      */
-    public function log($level, $message, array $context=[]): bool
+    public function log($level, $message, array $context = []): bool
     {
         if (!array_key_exists($level, self::PRIORITIES)) {
             throw new Exception('log level '.$level.' is unkown');
@@ -166,7 +178,7 @@ class Log extends AbstractLogger implements LoggerInterface
         foreach ($this->adapter as $adapter) {
             $prio = $adapter->getLevel();
  
-           if (self::PRIORITIES[$level] <= $prio) {
+            if (self::PRIORITIES[$level] <= $prio) {
                 $msg = $this->_format($message, $adapter->getFormat(), $adapter->getDateFormat(), $level, $context);
                 $adapter->log($level, $msg);
             }
@@ -181,9 +193,9 @@ class Log extends AbstractLogger implements LoggerInterface
      *
      * @param  string $name
      * @param  string $value
-     * @return Logger
+     * @return Log
      */
-    public function addContext(string $name, string $value): Logger
+    public function addContext(string $name, string $value): Log
     {
         $this->context[$name] = $value;
         return $this;
@@ -198,11 +210,11 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param   string $date_format
      * @param   string $level
      * @param   array $context
-     * @return  void
+     * @return  string
      */
-    protected function _format(string $message, string $format, string $date_format, string $level, array $context=[]): string
+    protected function _format(string $message, string $format, string $date_format, string $level, array $context = []): string
     {
-        $parsed = preg_replace_callback('/(\{(([a-z]\.*)+)\})/', function ($match) use ($message, $level, $date_format, $context) {
+        $parsed = preg_replace_callback('/(\{(([a-z]\.*)+)\})/', function($match) use ($message, $level, $date_format, $context) {
             $key = '';
             $context = array_merge($this->context, $context);
                     
@@ -225,9 +237,9 @@ class Log extends AbstractLogger implements LoggerInterface
                     $replace = [];
                     foreach ($context as $key => $val) {
                         if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                            $replace['{' . $key . '}'] = $val;
+                            $replace['{'.$key.'}'] = $val;
                         } else {
-                            $replace['{' . $key . '}'] = json_encode($val);
+                            $replace['{'.$key.'}'] = json_encode($val);
                         }
                     }
 

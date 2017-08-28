@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -181,7 +182,7 @@ class Router
      * @param  array $constructor
      * @return bool
      */
-    public function run(array $constructor=[]): bool
+    public function run(array $constructor = []): bool
     {
         $this->logger->info('execute requested route ['.$this->path.']', [
             'category' => get_class($this),
@@ -208,7 +209,7 @@ class Router
                     }
                 } else {
                     $this->logger->debug('requested path ['.$this->path.'] does not match route ['.$route->getPath().']', [
-                         'category' => get_class($this),
+                        'category' => get_class($this),
                     ]);
                 }
             }
@@ -270,7 +271,7 @@ class Router
      * @param   string $class
      * @param   string $method
      * @param   array $parsed_params
-     * @return  array
+     * @return  callable
      */
     protected function getParams(string $class, string $method, array $parsed_params): array
     {
@@ -285,7 +286,7 @@ class Router
                 if (!empty($body)) {
                     $json_params = json_decode($body, true);
                 } else {
-                    $parts  = explode('&', $_SERVER['QUERY_STRING']);
+                    $parts = explode('&', $_SERVER['QUERY_STRING']);
                     if (!empty($parts)) {
                         $json_params = json_decode(urldecode($parts[0]), true);
                     }

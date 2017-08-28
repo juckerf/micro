@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -60,8 +61,8 @@ class Stdout extends AbstractAdapter
      * Convert to bash color
      *
      * @param   string $string
-     * @param   string $forderground_color
-     * @param   string $backgrond_coilor
+     * @param   string $foreground_color
+     * @param   string $background_color
      * @return  string
      */
     public function getColoredString(string $string, string $foreground_color = null, string $background_color = null): string
@@ -70,15 +71,15 @@ class Stdout extends AbstractAdapter
 
         // Check if given foreground color found
         if (isset($this->foreground_colors[$foreground_color])) {
-            $colored_string .= "\033[" . $this->foreground_colors[$foreground_color] . "m";
+            $colored_string .= "\033[".$this->foreground_colors[$foreground_color]."m";
         }
         // Check if given background color found
         if (isset($this->background_colors[$background_color])) {
-            $colored_string .= "\033[" . $this->background_colors[$background_color] . "m";
+            $colored_string .= "\033[".$this->background_colors[$background_color]."m";
         }
 
         // Add string and end coloring
-        $colored_string .=  $string . "\033[0m";
+        $colored_string .= $string."\033[0m";
 
         return $colored_string;
     }
@@ -127,8 +128,6 @@ class Stdout extends AbstractAdapter
             break;
         }
         
-        //write to STDOUT does not work with threads
-        //$result = fwrite(STDOUT, $message."\n");
         echo $message."\n";
         return true;
     }

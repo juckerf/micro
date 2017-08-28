@@ -1,9 +1,10 @@
 <?php
-declare(strict_types=1);
+declare(strict_types = 1);
 
 /**
  * Micro
  *
+ * @author    Raffael Sahli <sahli@gyselroth.net>
  * @copyright Copyright (c) 2017 gyselroth GmbH (https://gyselroth.com)
  * @license   MIT https://opensource.org/licenses/MIT
  */
@@ -96,7 +97,7 @@ class Mysql
      * @param   Iterable $config
      * @param   Logger   $logger
      */
-    public function __construct(?Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, Logger $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -114,11 +115,11 @@ class Mysql
         $this->connection->set_charset($this->charset);
 
         if (!$this->connection->connect_errno) {
-            $this->logger->info('connection to mysql server [' . $this->host . '] was succesful', [
+            $this->logger->info('connection to mysql server ['.$this->host.'] was succesful', [
                 'category' => get_class($this),
             ]);
         } else {
-            throw new Exception('failed to connect to mysql server, error: ' .  $this->connection->connect_error.' ('.$this->connection->connect_errno.')');
+            throw new Exception('failed to connect to mysql server, error: '.$this->connection->connect_error.' ('.$this->connection->connect_errno.')');
         }
 
         return $this;
@@ -129,10 +130,10 @@ class Mysql
      * Forward calls
      *
      * @param  array $method
-     * @param  array $argumnets
+     * @param  array $arguments
      * @return mixed
      */
-    public function __call(string $method, array $arguments=[])
+    public function __call(string $method, array $arguments = [])
     {
         return call_user_func_array([&$this->connection, $method], $arguments);
     }
@@ -144,7 +145,7 @@ class Mysql
      * @param  Iterable $config
      * @return Mysql
      */
-    public function setOptions(?Iterable $config = null): Mysql
+    public function setOptions(? Iterable $config = null) : Mysql
     {
         if ($config === null) {
             return $this;
@@ -207,7 +208,7 @@ class Mysql
         $link   = $this->getResource();
         $result = $link->query($query);
 
-        if($result === false) {
+        if ($result === false) {
             throw new Exception('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
         }
 
@@ -230,7 +231,7 @@ class Mysql
         $link   = $this->getResource();
         $result = $link->query($query);
 
-        if($result === false) {
+        if ($result === false) {
             throw new Exception('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
         }
 
@@ -255,19 +256,19 @@ class Mysql
         $link  = $this->getResource();
         $stmt  = $link->prepare($query);
 
-        if(!($stmt instanceof mysqli_stmt)) {
+        if (!($stmt instanceof mysqli_stmt)) {
             throw new Exception('failed to prepare sql query with error '.$link->error.' ('.$link->errno.')');
         }
 
         $types = '';
-        foreach($values as $attr => $value) {
+        foreach ($values as $attr => $value) {
             $types .= 's';
         }
 
         $stmt->bind_param($types, ...$values);
         $stmt->execute();
 
-        if($stmt->error) {
+        if ($stmt->error) {
             throw new Exception($stmt->error);
         }
         
