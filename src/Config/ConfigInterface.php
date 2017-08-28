@@ -26,9 +26,9 @@ interface ConfigInterface
 
 
     /**
-     * Get entire simplexml
+     * Get raw format
      *
-     * @return \SimpleXMLElement
+     * @return mixed
      */
     public function getRaw();
 
@@ -37,7 +37,7 @@ interface ConfigInterface
      * Get from config
      *
      * @param   string $name
-     * @return  \SimpleXMLElement
+     * @return  mixed
      */
     public function __get(string $name);
 
@@ -48,7 +48,7 @@ interface ConfigInterface
      * @param   mixed $config
      * @return  ConfigInterface
      */
-    public function merge($config);
+    public function merge($config): ConfigInterface;
 
 
     /**

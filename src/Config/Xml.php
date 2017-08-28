@@ -156,9 +156,9 @@ class Xml implements ConfigInterface
      * Add config tree and merge it
      *
      * @param   ConfigInterface $config
-     * @return  Xml
+     * @return  ConfigInterface
      */
-    public function merge($config): Xml
+    public function merge($config): ConfigInterface
     {
         $merge = $config->getRaw();
         $this->appendSimplexml($this->store, $merge);
