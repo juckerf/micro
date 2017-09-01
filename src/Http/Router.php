@@ -71,14 +71,27 @@ class Router
         }
     }
 
-
     /**
-     * Add route
+     * Add route to the beginning of the routing table
      *
      * @param   Route $route
      * @return  Router
      */
-    public function addRoute(Route $route): Router
+    public function prependRoute(Route $route): Router
+    {
+        array_unshift($this->routes, $route);
+        $route->setRouter($this);
+        return $this;
+    }
+
+
+    /**
+     * Add route to the end of the routing table
+     *
+     * @param   Route $route
+     * @return  Router
+     */
+    public function appendRoute(Route $route): Router
     {
         $this->routes[] = $route;
         $route->setRouter($this);
@@ -187,7 +200,7 @@ class Router
         $this->logger->info('execute requested route ['.$this->path.']', [
             'category' => get_class($this),
         ]);
-
+        
         try {
             $match = false;
             foreach ($this->routes as $key => $route) {
@@ -206,6 +219,8 @@ class Router
                         if (!$route->continueAfterMatch()) {
                             break;
                         }
+                    } else {
+                        throw new Exception('found matching route ['.$route->getClass().'::'.$callable[1].'], but callable was not found');
                     }
                 } else {
                     $this->logger->debug('requested path ['.$this->path.'] does not match route ['.$route->getPath().']', [

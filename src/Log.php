@@ -70,7 +70,7 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param  Iterable $config
      * @return Log
      */
-    public function setOptions(? Iterable $config = null)
+    public function setOptions(? Iterable $config = null): Log
     {
         if ($config === null) {
             return $this;
@@ -78,6 +78,16 @@ class Log extends AbstractLogger implements LoggerInterface
 
         foreach ($config as $option => $value) {
             if (!isset($value['enabled']) || $value['enabled'] === '1') {
+                if(!isset($value['class'])) {
+                    throw new Exception('class option is requred');
+                }
+
+                if(isset($value['config'])) {
+                    $config = $value['config'];
+                } else {
+                    $config = null;
+                }
+
                 $this->addAdapter($option, $value['class'], $value['config']);
             }
         }
