@@ -324,7 +324,7 @@ class Router
 
                 if (isset($request_params[$param->name]) && $request_params[$param->name] !== '') {
                     if (is_bool($default)) {
-                        $return[$param->name] = Helper::boolParam($request_params[$param->name]);
+                        $return[$param->name] = (bool)$request_params[$param->name];
                     } elseif (is_int($default)) {
                         $return[$param->name] = (int)$request_params[$param->name];
                     } elseif (is_array($default)) {
