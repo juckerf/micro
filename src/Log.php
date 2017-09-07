@@ -132,6 +132,24 @@ class Log extends AbstractLogger implements LoggerInterface
 
 
     /**
+     * Inject adapter
+     *
+     * @param  string $name
+     * @param  AdapterInterface $adapter
+     * @return AdapterInterface
+     */
+    public function injectAdapter(string $name, AdapterInterface $adapter) : AdapterInterface
+    {
+        if ($this->hasAdapter($name)) {
+            throw new Exception('log adapter '.$name.' is already registered');
+        }
+            
+        $this->adapter[$name] = $adapter;
+        return $adapter;
+    }
+
+
+    /**
      * Get adapter
      *      
      * @param  string $name

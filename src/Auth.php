@@ -15,7 +15,7 @@ use \Micro\Auth\Exception;
 use \Micro\Auth\Adapter\AdapterInterface;
 use \Micro\Auth\Identity;
 use \Psr\Log\LoggerInterface as Logger;
-use \Micro\Http\Response;
+use \Micro\Auth\AttributeMap;
 
 class Auth
 {
@@ -48,7 +48,7 @@ class Auth
      *  
      * @var string
      */
-    protected $identity_class = '\\Micro\\Auth\\Identity';
+    protected $identity_class = Identity::class;
     
     
     /**
@@ -56,7 +56,7 @@ class Auth
      *  
      * @var string
      */
-    protected $attribute_map_class = '\\Micro\\Auth\\AttributeMap';
+    protected $attribute_map_class = AttributeMap::class;
 
 
     /**
@@ -149,6 +149,24 @@ class Auth
         if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('auth adapter must include AdapterInterface interface');
         }
+        $this->adapter[$name] = $adapter;
+        return $adapter;
+    }
+
+
+    /**
+     * Inject adapter
+     *
+     * @param  string $name
+     * @param  AdapterInterface $adapter
+     * @return AdapterInterface
+     */
+    public function injectAdapter(string $name, AdapterInterface $adapter) : AdapterInterface
+    {
+        if ($this->hasAdapter($name)) {
+            throw new Exception('auth adapter '.$name.' is already registered');
+        }
+            
         $this->adapter[$name] = $adapter;
         return $adapter;
     }
