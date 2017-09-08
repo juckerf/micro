@@ -54,20 +54,24 @@ class Router
     /**
      * Init router
      *
-     * @param   array $server
      * @param   Logger $logger
+     * @param   array $request
      * @return  void
      */
-    public function __construct(array $server, Logger $logger)
+    public function __construct(Logger $logger, ?array $request=null)
     {
         $this->logger = $logger;
-        
-        if (isset($server['PATH_INFO'])) {
-            $this->setPath($server['PATH_INFO']);
+
+        if($request === null) {
+            $request = $_SERVER;
+        }        
+
+        if (isset($request['PATH_INFO'])) {
+            $this->setPath($request['PATH_INFO']);
         }
         
-        if (isset($server['REQUEST_METHOD'])) {
-            $this->setVerb($server['REQUEST_METHOD']);
+        if (isset($request['REQUEST_METHOD'])) {
+            $this->setVerb($request['REQUEST_METHOD']);
         }
     }
 

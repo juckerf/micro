@@ -62,11 +62,11 @@ class Auth
     /**
      * Initialize
      *
-     * @param   Iterable $config
      * @param   Logger $logger
+     * @param   Iterable $config
      * @return  void
      */
-    public function __construct(? Iterable $config = null, Logger $logger)
+    public function __construct(Logger $logger, ? Iterable $config = null)
     {
         $this->logger = $logger;
         $this->setOptions($config);
@@ -145,7 +145,7 @@ class Auth
             throw new Exception('auth adapter '.$name.' is already registered');
         }
             
-        $adapter = new $class($config, $this->logger);
+        $adapter = new $class($this->logger, $config);
         if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('auth adapter must include AdapterInterface interface');
         }

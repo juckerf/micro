@@ -18,11 +18,11 @@ interface AdapterInterface
     /**
      * Authenticate
      *
-     * @param   Iterable $config
      * @param   Logger $logger
+     * @param   Iterable $config
      * @return  void
      */
-    public function __construct(? Iterable $config, Logger $logger);
+    public function __construct(Logger $logger, ? Iterable $config=null);
 
 
     /**
