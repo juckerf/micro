@@ -28,7 +28,7 @@ abstract class AbstractAdapter implements AdapterInterface
      *
      * @var string
      */
-    protected $date_format = 'U';
+    protected $date_format = 'Y-d-m H:i:s';
 
 
     /**

@@ -47,9 +47,7 @@ class Response
      *
      * @var array
      */
-    protected $headers = [
-        'Content-Type' => self::OUTPUT_FORMATS['json']
-    ];
+    protected $headers = [];
 
 
     /**
@@ -182,6 +180,8 @@ class Response
     {
         $this->body = $body;
         $this->body_only = $body_only;
+        $this->setOutputFormat($this->output_format);
+        
         return $this;
     }
 
@@ -204,9 +204,9 @@ class Response
      */
     public function send(): void
     {
-        $this->sendHeaders();
         $status = Http::STATUS_CODES[$this->code];
         header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
+        $this->sendHeaders();
 
         if ($this->body === null && $this->code == 204) {
             $this->terminate();
@@ -225,6 +225,10 @@ class Response
         }
         
         switch ($this->output_format) {
+            case null:
+            break;
+
+            default:
             case 'json':
                 echo $this->asJSON($body);
             break;

@@ -26,7 +26,6 @@ class Identity
 
 
     /**
-    /**
      * Auth adapter
      *
      * @var AdapterInterface
