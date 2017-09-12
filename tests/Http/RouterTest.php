@@ -15,7 +15,7 @@ class RouterTest extends TestCase
             'REQUEST_METHOD' => 'PUT',
         ];
 
-        $router = new Router($server, new MockLogger());
+        $router = new Router(new MockLogger(), $server);
         $this->assertEquals($router->getPath(), 'index.php/api/my/path');
         $this->assertEquals($router->getVerb(), 'put');
         return $router;
