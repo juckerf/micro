@@ -205,8 +205,8 @@ class Response
     public function send(): void
     {
         $status = Http::STATUS_CODES[$this->code];
-        header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
         $this->sendHeaders();
+        header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
 
         if ($this->body === null && $this->code == 204) {
             $this->terminate();
