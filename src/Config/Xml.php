@@ -62,7 +62,10 @@ class Xml implements ConfigInterface
                 
                 unset($node->attributes()->inherits);
                 $found = array_shift($found);
-                $this->appendSimplexml($node, $found);
+
+                $temp = clone $found;
+                $this->appendSimplexml($temp, $node);
+                $this->appendSimplexml($node, $temp);
             }
         }
         
@@ -71,7 +74,7 @@ class Xml implements ConfigInterface
             if (!isset($store[(string)$attrs['inherits']])) {
                 throw new Exception('parent env '.$attrs['inherits'].' is not configured');
             } else {
-                $this->appendSimplexml($config, $store[(string)$attrs['inherits']]);
+                $this->appendSimplexml($store[(string)$attrs['inherits']], $config);
             }
         }
         
