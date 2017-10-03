@@ -44,20 +44,6 @@ class Ldap extends AbstractAdapter
     
 
     /**
-     * Ldap connect
-     *
-     * @param   Iterable $config
-     * @param   Logger $logger
-     * @return  void
-     */
-    public function __construct(? Iterable $config, Logger $logger)
-    {
-        $this->logger = $logger;
-        $this->setOptions($config);
-    }
-    
-
-    /**
      * Set options
      *
      * @param   Iterable $config

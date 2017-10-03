@@ -15,7 +15,7 @@ class RouterTest extends TestCase
             'REQUEST_METHOD' => 'PUT',
         ];
 
-        $router = new Router($server, new MockLogger());
+        $router = new Router(new MockLogger(), $server);
         $this->assertEquals($router->getPath(), 'index.php/api/my/path');
         $this->assertEquals($router->getVerb(), 'put');
         return $router;
@@ -44,10 +44,10 @@ class RouterTest extends TestCase
     /**
      * @depends testInit
      */
-    public function testAddRoute($router)
+    public function testAppendRoute($router)
     {
         $this->assertCount(0, $router->getRoutes());
-        $router->addRoute(new Route('/', 'Controller'));
+        $router->appendRoute(new Route('/', 'Controller'));
         $this->assertCount(1, $router->getRoutes());
     }
     

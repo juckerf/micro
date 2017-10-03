@@ -27,7 +27,11 @@ class Response
     /**
      * Possible output formats
      */
-    const OUTPUT_FORMATS = ['json', 'xml', 'text'];
+    const OUTPUT_FORMATS = [
+        'json' => 'application/json; charset=utf-8', 
+        'xml'  => 'application/xml; charset=utf-8', 
+        'text' => 'text/html; charset=utf-8'
+    ];
 
 
     /**
@@ -91,6 +95,22 @@ class Response
     public function setHeader(string $header, string $value): Response
     {
         $this->headers[$header] = $value;
+        return $this;
+    }
+    
+
+    /**
+     * Delete header
+     *
+     * @param   string $header
+     * @return  Response
+     */
+    public function removeHeader(string $header): Response
+    {
+        if(isset($this->headers[$header])) {
+            unset($this->headers[$header]);
+        }
+
         return $this;
     }
 
@@ -160,6 +180,8 @@ class Response
     {
         $this->body = $body;
         $this->body_only = $body_only;
+        $this->setOutputFormat($this->output_format);
+        
         return $this;
     }
 
@@ -182,8 +204,8 @@ class Response
      */
     public function send(): void
     {
-        $this->sendHeaders();
         $status = Http::STATUS_CODES[$this->code];
+        $this->sendHeaders();
         header('HTTP/1.0 '.$this->code.' '.$status, true, $this->code);
 
         if ($this->body === null && $this->code == 204) {
@@ -191,7 +213,7 @@ class Response
         }
         
         if($this->body instanceof Closure) {
-            $body = $this->body();
+            $body = $this->body->call($this);
         } else {
             $body = $this->body;
         }
@@ -203,6 +225,9 @@ class Response
         }
         
         switch ($this->output_format) {
+            case null:
+            break;
+
             default:
             case 'json':
                 echo $this->asJSON($body);
@@ -266,8 +291,6 @@ class Response
      */
     public function asJSON($body): string
     {
-        header('Content-Type: application/json; charset=utf-8');
-
         if ($this->pretty_format) {
             $result = json_encode($body, JSON_PRETTY_PRINT);
         } else {
@@ -314,7 +337,6 @@ class Response
      */
     public function asXML($body): string
     {
-        header('Content-Type: application/xml; charset=utf-8');
         $root = new Config('<response></response>');
         $raw = $this->toXML($body, $root, 'node');
         
@@ -347,11 +369,21 @@ class Response
     /**
      * Set the current output format.
      *
-     * @param  string $format a key of $outputForms
+     * @param  string $format
      * @return Response
      */
-    public function setOutputFormat(string $format): Response
+    public function setOutputFormat(?string $format=null): Response
     {
+        if($format === null) {
+            $this->output_format = null;
+            return $this->removeHeader('Content-Type');
+        }
+
+        if(!array_key_exists($format, self::OUTPUT_FORMATS)) {
+            throw new Exception('invalid output format given');
+        }
+
+        $this->setHeader('Content-Type', self::OUTPUT_FORMATS[$format]);
         $this->output_format = $format;
         return $this;
     }

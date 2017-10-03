@@ -70,7 +70,7 @@ class Log extends AbstractLogger implements LoggerInterface
      * @param  Iterable $config
      * @return Log
      */
-    public function setOptions(? Iterable $config = null)
+    public function setOptions(? Iterable $config = null): Log
     {
         if ($config === null) {
             return $this;
@@ -78,6 +78,16 @@ class Log extends AbstractLogger implements LoggerInterface
 
         foreach ($config as $option => $value) {
             if (!isset($value['enabled']) || $value['enabled'] === '1') {
+                if(!isset($value['class'])) {
+                    throw new Exception('class option is requred');
+                }
+
+                if(isset($value['config'])) {
+                    $config = $value['config'];
+                } else {
+                    $config = null;
+                }
+
                 $this->addAdapter($option, $value['class'], $value['config']);
             }
         }
@@ -116,6 +126,24 @@ class Log extends AbstractLogger implements LoggerInterface
         if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('log adapter must include AdapterInterface interface');
         }
+        $this->adapter[$name] = $adapter;
+        return $adapter;
+    }
+
+
+    /**
+     * Inject adapter
+     *
+     * @param  string $name
+     * @param  AdapterInterface $adapter
+     * @return AdapterInterface
+     */
+    public function injectAdapter(string $name, AdapterInterface $adapter) : AdapterInterface
+    {
+        if ($this->hasAdapter($name)) {
+            throw new Exception('log adapter '.$name.' is already registered');
+        }
+            
         $this->adapter[$name] = $adapter;
         return $adapter;
     }

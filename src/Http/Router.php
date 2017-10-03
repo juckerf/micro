@@ -54,31 +54,48 @@ class Router
     /**
      * Init router
      *
-     * @param   array $server
      * @param   Logger $logger
+     * @param   array $request
      * @return  void
      */
-    public function __construct(array $server, Logger $logger)
+    public function __construct(Logger $logger, ?array $request=null)
     {
         $this->logger = $logger;
-        
-        if (isset($server['PATH_INFO'])) {
-            $this->setPath($server['PATH_INFO']);
+
+        if($request === null) {
+            $request = $_SERVER;
+        }        
+
+        if (isset($request['PATH_INFO'])) {
+            $this->setPath($request['PATH_INFO']);
         }
         
-        if (isset($server['REQUEST_METHOD'])) {
-            $this->setVerb($server['REQUEST_METHOD']);
+        if (isset($request['REQUEST_METHOD'])) {
+            $this->setVerb($request['REQUEST_METHOD']);
         }
     }
 
-
     /**
-     * Add route
+     * Add route to the beginning of the routing table
      *
      * @param   Route $route
      * @return  Router
      */
-    public function addRoute(Route $route): Router
+    public function prependRoute(Route $route): Router
+    {
+        array_unshift($this->routes, $route);
+        $route->setRouter($this);
+        return $this;
+    }
+
+
+    /**
+     * Add route to the end of the routing table
+     *
+     * @param   Route $route
+     * @return  Router
+     */
+    public function appendRoute(Route $route): Router
     {
         $this->routes[] = $route;
         $route->setRouter($this);
@@ -187,7 +204,7 @@ class Router
         $this->logger->info('execute requested route ['.$this->path.']', [
             'category' => get_class($this),
         ]);
-
+        
         try {
             $match = false;
             foreach ($this->routes as $key => $route) {
@@ -206,6 +223,10 @@ class Router
                         if (!$route->continueAfterMatch()) {
                             break;
                         }
+                    } else {
+                        $this->logger->debug('found matching route ['.$route->getClass().'::'.$callable[1].'], but callable was not found', [
+                            'category' => get_class($this),
+                        ]);
                     }
                 } else {
                     $this->logger->debug('requested path ['.$this->path.'] does not match route ['.$route->getPath().']', [
@@ -309,7 +330,7 @@ class Router
 
                 if (isset($request_params[$param->name]) && $request_params[$param->name] !== '') {
                     if (is_bool($default)) {
-                        $return[$param->name] = Helper::boolParam($request_params[$param->name]);
+                        $return[$param->name] = (bool)$request_params[$param->name];
                     } elseif (is_int($default)) {
                         $return[$param->name] = (int)$request_params[$param->name];
                     } elseif (is_array($default)) {

@@ -67,7 +67,7 @@ class AttributeMap
         $attrs = [];
         foreach ($this->map as $attr => $value) {
             if (array_key_exists($value['attr'], $data)) {
-                $this->logger->info('found attribut mapping ['.$attr.'] => [('.$value['type'].') '.$value['attr'].']', [
+                $this->logger->info('found attribute mapping ['.$attr.'] => [('.$value['type'].') '.$value['attr'].']', [
                     'category' => get_class($this),
                 ]);
 

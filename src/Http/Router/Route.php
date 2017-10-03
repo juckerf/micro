@@ -97,7 +97,6 @@ class Route
             }
         }, $this->path);
 
-
         if (preg_match('#^'.$regex.'#', $this->router->getPath(), $matches)) {
             foreach ($matches as $key => $value) {
                 if (!is_int($key)) {
@@ -140,7 +139,7 @@ class Route
      * @param   string $name
      * @return  string
      */
-    protected function _buildMethodName(? string $name) : string
+    protected function buildMethodName(? string $name) : string
     {
         $result = $this->router->getVerb();
         
@@ -232,6 +231,18 @@ class Route
 
 
     /**
+     * Convert camelCase to dashes
+     *
+     * @param  string $value
+     * @return string
+     */
+    protected function camelCase2Dashes(string $value): string
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $value));
+    }
+
+
+    /**
      * Get method
      *
      * @return string
@@ -249,13 +260,13 @@ class Route
             $this->method = $action;
         }
 
-        $short = strtolower(substr($this->class, strrpos($this->class, '\\') + 1));
+        $short = $this->camelCase2Dashes(substr($this->class, strrpos($this->class, '\\') + 1));
 
-        if ($short === $action) {
+        if ($this->camelCase2Dashes($short) === $action) {
             $this->method = '';
         }
 
-        return $this->_buildMethodName($this->method);
+        return $this->buildMethodName($this->method);
     }
 
     

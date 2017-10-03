@@ -51,11 +51,11 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * Init adapter
      *
-     * @param   Iterable $config
      * @param   Logger $logger
+     * @param   Iterable $config
      * @return  void
      */
-    public function __construct(? Iterable $config, Logger $logger)
+    public function __construct(Logger $logger, ?Iterable $config=null)
     {
         $this->logger = $logger;
         $this->setOptions($config);
