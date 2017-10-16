@@ -21,14 +21,6 @@ interface AdapterInterface
      */
     public function log(string $level, string $log): bool;
 
-    
-    /**
-     * Create adapter
-     *
-     * @return void
-     */
-    public function __construct(? Iterable $config = null);
-    
 
     /**
      * Get format
@@ -42,15 +34,15 @@ interface AdapterInterface
      * Get date format
      */
     public function getDateFormat(): string;
-    
-    
+
+
     /**
      * Get level
      *
      * @return int
      */
     public function getLevel(): int;
-    
+
 
     /**
      * Set options

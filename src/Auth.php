@@ -16,8 +16,9 @@ use \Micro\Auth\Adapter\AdapterInterface;
 use \Micro\Auth\Identity;
 use \Psr\Log\LoggerInterface as Logger;
 use \Micro\Auth\AttributeMap;
+use \Micro\Container\AdapterAwareInterface;
 
-class Auth
+class Auth implements AdapterAwareInterface;
 {
     /**
      * Adapter
@@ -25,7 +26,7 @@ class Auth
      * @var array
      */
     protected $adapter = [];
-    
+
 
     /**
      * Identity
@@ -45,15 +46,15 @@ class Auth
 
     /**
      * Identity class
-     *  
+     *
      * @var string
      */
     protected $identity_class = Identity::class;
-    
-    
+
+
     /**
      * Attribute map class
-     *  
+     *
      * @var string
      */
     protected $attribute_map_class = AttributeMap::class;
@@ -87,34 +88,19 @@ class Auth
 
         foreach ($config as $option => $value) {
             switch ($option) {
-                case 'identity_class': 
-                case 'attribute_map_class': 
+                case 'identity_class':
+                case 'attribute_map_class':
                     $this->{$option} = (string)$value;
                 break;
 
                 case 'adapter':
                     foreach ($value as $name => $adapter) {
-                        if (!isset($adapter['enabled']) || $adapter['enabled'] === '1') {
-                            if (!isset($adapter['class'])) {
-                                throw new Exception('class option is required');
-                            }
-                        
-                            if (isset($adapter['config'])) {
-                                $config = $adapter['config'];
-                            } else {
-                                $config = null;
-                            }
-                            $this->addAdapter($name, $adapter['class'], $config);
-                        } else {
-                            $this->logger->debug("skip disabled authentication adapter [".$name."]", [
-                                'category' => get_class($this)
-                            ]);
-                        }
+                        $this->injectAdapter($name, $adapter);
                     }
                 break;
             }
-        }    
-    
+        }
+
         return $this;
     }
 
@@ -132,29 +118,6 @@ class Auth
 
 
     /**
-     * Add adapter
-     *
-     * @param  string $name
-     * @param  string $class
-     * @param  Iterable $config
-     * @return AdapterInterface
-     */
-    public function addAdapter(string $name, string $class, ? Iterable $config = null) : AdapterInterface
-    {
-        if ($this->hasAdapter($name)) {
-            throw new Exception('auth adapter '.$name.' is already registered');
-        }
-            
-        $adapter = new $class($this->logger, $config);
-        if (!($adapter instanceof AdapterInterface)) {
-            throw new Exception('auth adapter must include AdapterInterface interface');
-        }
-        $this->adapter[$name] = $adapter;
-        return $adapter;
-    }
-
-
-    /**
      * Inject adapter
      *
      * @param  string $name
@@ -166,7 +129,7 @@ class Auth
         if ($this->hasAdapter($name)) {
             throw new Exception('auth adapter '.$name.' is already registered');
         }
-            
+
         $this->adapter[$name] = $adapter;
         return $adapter;
     }
@@ -174,7 +137,7 @@ class Auth
 
     /**
      * Get adapter
-     *      
+     *
      * @param  string $name
      * @return AdapterInterface
      */
@@ -190,7 +153,7 @@ class Auth
 
     /**
      * Get adapters
-     *      
+     *
      * @param  array $adapters
      * @return array
      */
@@ -234,17 +197,17 @@ class Auth
     public function requireOne(): bool
     {
         $result = false;
-        
+
         foreach ($this->adapter as $name => $adapter) {
             try {
                 if ($adapter->authenticate()) {
-                    $this->createIdentity($adapter);      
- 
+                    $this->createIdentity($adapter);
+
                     $this->logger->info("identity [{$this->identity->getIdentifier()}] authenticated over adapter [{$name}]", [
                         'category' => get_class($this)
                     ]);
                     $_SERVER['REMOTE_USER'] = $this->identity->getIdentifier();
-                    
+
                     return true;
                 }
             } catch (\Exception $e) {
@@ -253,12 +216,12 @@ class Auth
                     'exception'=> $e
                 ]);
             }
-        
+
             $this->logger->debug("auth adapter [{$name}] failed", [
                 'category' => get_class($this)
             ]);
         }
-        
+
         $this->logger->warning("all authentication adapter have failed", [
             'category' => get_class($this)
         ]);
