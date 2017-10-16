@@ -18,7 +18,7 @@ use \Psr\Log\LoggerInterface as Logger;
 use \Micro\Auth\AttributeMap;
 use \Micro\Container\AdapterAwareInterface;
 
-class Auth implements AdapterAwareInterface;
+class Auth implements AdapterAwareInterface
 {
     /**
      * Adapter
