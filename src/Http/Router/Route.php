@@ -13,6 +13,7 @@ namespace Micro\Http\Router;
 
 use \Micro\Exception;
 use \Micro\Http\Router;
+use \Psr\Container\ContainerInterface;
 
 class Route
 {
@@ -30,7 +31,7 @@ class Route
      * @var bool
      */
     protected $continue_propagation = false;
-    
+
 
     /**
      * Route path
@@ -55,7 +56,7 @@ class Route
      */
     protected $method;
 
-       
+
     /**
      * Found request parameters
      *
@@ -103,26 +104,30 @@ class Route
                     $this->params[$key] = $value;
                 }
             }
-            
+
             return true;
         }
-        
+
         return false;
     }
-   
+
 
     /**
      * Get callable
      *
-     * @param  array $constructor
+     * @param  ContainerInterface $container
      * @return array
      */
-    public function getCallable($constructor = []): array
+    public function getCallable(?ContainerInterface $container=null): array
     {
         if (is_object($this->class)) {
             $instance = $this->class;
         } else {
-            $instance = new $this->class(...$constructor);
+            if($container === null) {
+                $instance = new $this->class();
+            } else {
+                $instance = $container->get($this->class);
+            }
         }
 
         if ($this->method !== null) {
@@ -142,7 +147,7 @@ class Route
     protected function buildMethodName(? string $name) : string
     {
         $result = $this->router->getVerb();
-        
+
         if ($name !== null) {
             $split = explode('-', $name);
             foreach ($split as $part) {
@@ -153,7 +158,7 @@ class Route
         return $result;
     }
 
-    
+
     /**
      * Get http router
      *
@@ -187,7 +192,7 @@ class Route
     {
         return $this->path;
     }
-    
+
 
     /**
      * Set path
@@ -269,7 +274,7 @@ class Route
         return $this->buildMethodName($this->method);
     }
 
-    
+
     /**
      * Set method
      *
@@ -282,7 +287,7 @@ class Route
         return $this;
     }
 
-    
+
     /**
      * Set params
      *

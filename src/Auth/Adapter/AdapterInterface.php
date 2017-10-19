@@ -11,20 +11,8 @@ declare(strict_types = 1);
 
 namespace Micro\Auth\Adapter;
 
-use \Psr\Log\LoggerInterface as Logger;
-
 interface AdapterInterface
 {
-    /**
-     * Authenticate
-     *
-     * @param   Logger $logger
-     * @param   Iterable $config
-     * @return  void
-     */
-    public function __construct(Logger $logger, ? Iterable $config=null);
-
-
     /**
      * Get attribute sync cache
      *
@@ -47,7 +35,7 @@ interface AdapterInterface
      * @return string
      */
     public function getIdentifier(): string;
- 
+
 
     /**
      * Get attribute map
@@ -55,8 +43,8 @@ interface AdapterInterface
      * @return Iterable
      */
     public function getAttributeMap(): Iterable;
-   
-    
+
+
     /**
      * Get identity attributes
      *

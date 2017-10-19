@@ -41,7 +41,7 @@ class Ldap extends AbstractAdapter
      * @var string
      */
     protected $account_filter = '(uid=%s)';
-    
+
 
     /**
      * Set options
@@ -54,26 +54,26 @@ class Ldap extends AbstractAdapter
         if ($config === null) {
             return $this;
         }
-        
+
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'ldap':
                     $this->ldap = new LdapServer($value, $this->logger);
                 break;
-                
+
                 case 'account_filter':
                     $this->account_filter = $value;
                 break;
             }
         }
-        
+
         if (!isset($config['ldap'])) {
             $this->ldap = new LdapServer();
         }
 
         return parent::setOptions($config);
     }
-    
+
 
     /**
      * Authenticate
@@ -86,13 +86,13 @@ class Ldap extends AbstractAdapter
             $this->logger->debug('skip auth adapter ['.get_class($this).'], no http authorization header found', [
                 'category' => get_class($this)
             ]);
-        
+
             return false;
         }
 
         $header = $_SERVER['HTTP_AUTHORIZATION'];
         $parts  = explode(' ', $header);
-        
+
         if ($parts[0] == 'Basic') {
             $this->logger->debug('found http basic authorization header', [
                 'category' => get_class($this)
@@ -106,7 +106,7 @@ class Ldap extends AbstractAdapter
             $this->logger->warning('http authorization header contains no basic string or invalid authentication string', [
                 'category' => get_class($this)
             ]);
-        
+
             return false;
         }
     }
@@ -164,7 +164,7 @@ class Ldap extends AbstractAdapter
         return true;
     }
 
-    
+
     /**
      * Get attributes
      *

@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Micro\Auth\Adapter;
 
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Micro\Auth\Exception;
 
 class Oidc extends AbstractAdapter
@@ -32,7 +32,7 @@ class Oidc extends AbstractAdapter
 
     /**
      * Token validation endpoint (rfc7662)
-     * 
+     *
      * @var string
      */
     protected $token_validation_url;
@@ -44,11 +44,11 @@ class Oidc extends AbstractAdapter
      * @var string
      */
     protected $identity_attribute = 'preferred_username';
-     
+
 
     /**
      * Attributes
-     * 
+     *
      * @var array
      */
     protected $attributes = [];
@@ -60,6 +60,20 @@ class Oidc extends AbstractAdapter
      * @var string
      */
     private $access_token;
+
+
+    /**
+     * Init adapter
+     *
+     * @param   LoggerInterface $logger
+     * @param   Iterable $config
+     * @return  void
+     */
+    public function __construct(LoggerInterface $logger, ?Iterable $config=null)
+    {
+        $this->logger = $logger;
+        $this->setOptions($config);
+    }
 
 
     /**
@@ -84,7 +98,7 @@ class Oidc extends AbstractAdapter
             }
         }
 
-        return  parent::setOptions($config);        
+        return  parent::setOptions($config);
     }
 
 
@@ -99,37 +113,37 @@ class Oidc extends AbstractAdapter
             $this->logger->debug('skip auth adapter ['.get_class($this).'], no http authorization header or access_token param found', [
                 'category' => get_class($this)
             ]);
-        
+
             return false;
         } else {
             $header = $_SERVER['HTTP_AUTHORIZATION'];
             $parts  = explode(' ', $header);
-            
+
             if ($parts[0] == 'Bearer') {
                 $this->logger->debug('found http bearer authorization header', [
                     'category' => get_class($this)
                 ]);
-                
+
                 return $this->verifyToken($parts[1]);
             } else {
                 $this->logger->debug('http authorization header contains no bearer string or invalid authentication string', [
                     'category' => get_class($this)
                 ]);
-            
+
                 return false;
             }
         }
     }
 
-    
+
     /**
      * Get discovery url
      *
-     * @return string 
+     * @return string
      */
     public function getDiscoveryUrl(): string
     {
-        return $this->provider_url.self::DISCOVERY_PATH;    
+        return $this->provider_url.self::DISCOVERY_PATH;
     }
 
 
@@ -137,7 +151,7 @@ class Oidc extends AbstractAdapter
      * Get discovery document
      *
      * @return array
-     */    
+     */
     public function getDiscoveryDocument(): array
     {
         if ($apc = extension_loaded('apc') && apc_exists($this->provider_url)) {
@@ -162,7 +176,7 @@ class Oidc extends AbstractAdapter
                     'category' => get_class($this),
                     'discovery'=> $discovery
                 ]);
-            
+
                 if ($apc === true) {
                     apc_store($this->provider_url, $discovery);
                 }
@@ -202,10 +216,10 @@ class Oidc extends AbstractAdapter
             $this->logger->debug('validate token via openid-connect userinfo_endpoint ['.$discovery['userinfo_endpoint'].']', [
                'category' => get_class($this),
             ]);
-        
+
             $url = $discovery['userinfo_endpoint'].'?access_token='.$token;
         }
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -213,21 +227,21 @@ class Oidc extends AbstractAdapter
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         $response = json_decode($result, true);
-        
+
         if($code === 200) {
             $attributes = json_decode($result, true);
             $this->logger->debug('successfully verified oauth2 access token via authorization server', [
                'category' => get_class($this),
             ]);
-        
+
             if(!isset($attributes[$this->identity_attribute])) {
                 throw new Exception('identity attribute '.$this->identity_attribute.' not found in oauth2 response');
             }
 
             $this->identifier = $attributes['preferred_username'];
-        
+
             if($this->token_validation_url) {
-                $this->attributes = $attributes;    
+                $this->attributes = $attributes;
             } else {
                 $this->access_token = $token;
             }
@@ -237,7 +251,7 @@ class Oidc extends AbstractAdapter
             $this->logger->error('failed verify oauth2 access token via authorization server, received status ['.$code.']', [
                'category' => get_class($this),
             ]);
-            
+
             throw new Exception('failed verify oauth2 access token via authorization server');
         }
     }
@@ -245,7 +259,7 @@ class Oidc extends AbstractAdapter
 
     /**
      * Get attributes
-     * 
+     *
      * @return array
      */
     public function getAttributes(): array
@@ -262,7 +276,7 @@ class Oidc extends AbstractAdapter
         $this->logger->debug('fetch user attributes from userinfo_endpoint ['.$discovery['userinfo_endpoint'].']', [
            'category' => get_class($this),
         ]);
-        
+
         $url = $discovery['userinfo_endpoint'].'?access_token='.$this->access_token;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -271,19 +285,19 @@ class Oidc extends AbstractAdapter
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         $response = json_decode($result, true);
-        
+
         if($code === 200) {
             $attributes = json_decode($result, true);
             $this->logger->debug('successfully requested user attributes from userinfo_endpoint', [
                'category' => get_class($this),
             ]);
-        
-            return $this->attributes = $attributes;    
+
+            return $this->attributes = $attributes;
         } else {
             $this->logger->error('failed requesting user attributes from userinfo_endpoint, status code ['.$code.']', [
                'category' => get_class($this),
             ]);
-            
+
             throw new Exception('failed requesting user attribute from userinfo_endpoint');
         }
 

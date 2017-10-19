@@ -18,7 +18,8 @@
     },
     "require": {
         "php": ">=7.1",
-        "psr/log": "1.*"
+        "psr/log": "1.*",
+        "psr/container": "*"
     },
     "suggest": {
         "ext-xml": "required if you want to use \\Micro\\Config\\Xml",

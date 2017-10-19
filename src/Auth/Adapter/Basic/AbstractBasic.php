@@ -27,6 +27,20 @@ abstract class AbstractBasic extends AbstractAdapter
 
 
     /**
+     * Init adapter
+     *
+     * @param   LoggerInterface $logger
+     * @param   Iterable $config
+     * @return  void
+     */
+    public function __construct(LoggerInterface $logger, ?Iterable $config=null)
+    {
+        $this->logger = $logger;
+        $this->setOptions($config);
+    }
+
+
+    /**
      * Authenticate
      *
      * @return bool
@@ -37,13 +51,13 @@ abstract class AbstractBasic extends AbstractAdapter
             $this->logger->debug('skip auth adapter ['.get_class($this).'], no http authorization header found', [
                 'category' => get_class($this)
             ]);
-        
+
             return false;
         }
 
         $header = $_SERVER['HTTP_AUTHORIZATION'];
         $parts  = explode(' ', $header);
-        
+
         if ($parts[0] == 'Basic') {
             $this->logger->debug('found http basic authorization header', [
                 'category' => get_class($this)
@@ -57,7 +71,7 @@ abstract class AbstractBasic extends AbstractAdapter
             $this->logger->warning('http authorization header contains no basic string or invalid authentication string', [
                 'category' => get_class($this)
             ]);
-        
+
             return false;
         }
     }
@@ -86,7 +100,7 @@ abstract class AbstractBasic extends AbstractAdapter
             $this->logger->info('found no password for ['.$username.'] in database', [
                 'category' => get_class($this)
             ]);
-         
+
             return false;
         }
 
@@ -94,11 +108,11 @@ abstract class AbstractBasic extends AbstractAdapter
             $this->logger->info('failed match given password for ['.$username.'] with stored hash in database', [
                 'category' => get_class($this)
             ]);
-         
+
             return false;
         }
 
-        $this->attributes = $result;        
+        $this->attributes = $result;
         $this->identifier = $username;
         return true;
     }
@@ -115,10 +129,10 @@ abstract class AbstractBasic extends AbstractAdapter
 
     /**
      * Get attributes
-     * 
+     *
      * @return array
      */
-    public function getAttributes(): array 
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

@@ -15,15 +15,16 @@ use \ReflectionClass;
 use \Closure;
 use \Micro\Container\Exception;
 use \Micro\Container\AdapterAwareInterface;
+use \Psr\Container\ContainerInterface;
 
-class Container
+class Container implements ContainerInterface
 {
     /**
      * Config
      *
      * @var array
      */
-    protected $config;
+    protected $config = [];
 
 
     /**
@@ -49,7 +50,84 @@ class Container
      */
     public function __construct(array $config=[])
     {
-        $this->config = $config;
+        $this->flattenConfig($config);
+        $container = $this;
+        $this->add(ContainerInterface::class, function() use($container){
+            return $container;
+        });
+    }
+
+
+    /**
+     * Flatten config
+     *
+     * @param  Iterable $config
+     * @param  string $parent
+     * @return array
+     */
+    protected function flattenConfig(Iterable $config, ?string $parent=null): array
+    {
+        $flat = [];
+        foreach($config as $name => $service) {
+            if(isset($service['name']) && $parent === null) {
+                $id = $service['name'];
+           } else {
+                if($parent === null) {
+                    $id = $name;
+                } else {
+                    $id = $parent.'.'.$name;
+                }
+            }
+
+            $flat[$id] = [
+                'name' => $name
+            ];
+
+            foreach($service as $option => $value) {
+                switch($option) {
+
+                    case 'name' :
+                    case 'use' :
+                        $flat[$id][$option] = $value;
+                    break;
+
+                    case 'options':
+                        $flat[$id][$option] = (array)$value;
+                    break;
+
+                    case 'service':
+                        $flat[$id]['parent'] = $parent;
+                        $parent = $parent.'.'.$name;
+                        $services = $this->flattenConfig($service['service'], $parent);
+                        $flat[$id]['service'] = [];
+                        foreach($services as $key => $sub) {
+                            $flat[$id]['service'][$sub['name']] = $key;
+                        }
+                    break;
+
+                    case 'adapter':
+                        $flat[$id]['adapter'] = $this->flattenConfig($service['adapter']);
+                    break;
+
+                    default:
+                        throw new Exception('invalid container configuration '.$option.' given');
+                }
+            }
+        }
+
+        $this->config = array_merge($this->config, $flat);
+        return $flat;
+    }
+
+
+    /**
+     * Get all services
+     *
+     * @return array
+     */
+    public function getAll(): array
+    {
+        return $this->service;
     }
 
 
@@ -59,7 +137,7 @@ class Container
      * @param  string $name
      * @return mixed
      */
-    public function get(string $name)
+    public function get($name)
     {
         if($this->has($name)) {
             return $this->service[$name];
@@ -98,7 +176,7 @@ class Container
      *
      * @return bool
      */
-    public function has(string $name): bool
+    public function has($name): bool
     {
         return isset($this->service[$name]);
     }
@@ -112,13 +190,20 @@ class Container
      */
     protected function autoWire(string $name)
     {
-        if(isset($this->config[$name]) && isset($this->config[$name]['class'])) {
-            $class = $this->config[$name]['class'];
+        if(isset($this->config[$name]['use'])) {
+            $class = $this->config[$name]['use'];
+        } elseif(isset($this->config[$name]['name'])) {
+            $class = $this->config[$name]['name'];
         } else {
             $class = $name;
         }
 
-        $reflection = new ReflectionClass($class);
+        try {
+            $reflection = new ReflectionClass($class);
+        } catch(\Exception $e) {
+            throw new Exception($class.' can not be resolved to an existing class');
+        }
+
         $constructor = $reflection->getConstructor();
 
         if($constructor === null) {
@@ -143,11 +228,30 @@ class Container
                     }
                 } else {
                     $type_class = $type->getName();
-                    $args[$type_class] = $this->get($type_class);
-                }
+                    $args[$param_name] = $this->findParentService($name, $type_class);
+               }
             }
 
             return $this->createInstance($name, $reflection, $args);
+        }
+    }
+
+
+    /**
+     * Traverse services with parents and find correct service to use
+     *
+     * @param  string $name
+     * @param  string $class
+     * @return mixed
+     */
+    protected function findParentService(string $name, string $class)
+    {
+        if(isset($this->config[$name]['service'][$class])) {
+            return $this->get($this->config[$name]['service'][$class]);
+        } elseif(isset($this->config[$name]['parent'])) {
+            return $this->findParentService($this->config[$name]['parent'], $class);
+        } else {
+            return $this->get($class);
         }
     }
 
@@ -164,17 +268,17 @@ class Container
     {
         $instance = $class->newInstanceArgs($args);
         if($instance instanceof AdapterAwareInterface) {
-            if(isset($this->config[$name]) && isset($this->config[$name]['adapter'])) {
+            if(isset($this->config[$name]['adapter'])) {
                 foreach($this->config[$name]['adapter'] as $adapter => $config) {
-                    if(!isset($config['class'])) {
-                        throw new Exception('adapter requires class configuration');
+                    if(!isset($config['name'])) {
+                        throw new Exception('adapter requires name configuration');
                     }
 
                     if(isset($config['enabled']) && $config['enabled'] === '0') {
                         continue;
                     }
 
-                    $adapter_instance = $this->get($config['class']);
+                    $adapter_instance = $this->get($config['name']);
                     $instance->injectAdapter($adapter, $adapter_instance);
                 }
             }

@@ -16,23 +16,13 @@ use \Micro\Config;
 interface ConfigInterface
 {
     /**
-     * Load
-     *
-     * @param  string $config
-     * @param  string $env
-     * @return void
-     */
-    public function __construct(string $config, string $env);
-
-
-    /**
      * Get raw format
      *
      * @return mixed
      */
     public function getRaw();
 
-    
+
     /**
      * Get from config
      *
