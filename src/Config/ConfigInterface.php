@@ -26,29 +26,12 @@ interface ConfigInterface
 
 
     /**
-     * Get raw format
-     *
-     * @return mixed
-     */
-    public function getRaw();
-
-    
-    /**
      * Get from config
      *
      * @param   string $name
      * @return  mixed
      */
     public function __get(string $name);
-
-
-    /**
-     * Add config tree and merge it
-     *
-     * @param   mixed $config
-     * @return  ConfigInterface
-     */
-    public function merge($config): ConfigInterface;
 
 
     /**
