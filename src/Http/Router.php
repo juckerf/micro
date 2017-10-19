@@ -68,7 +68,7 @@ class Router
      * @param   array $request
      * @return  void
      */
-    public function __construct(LoggerInterface $logger, ?ContainerInterface $container=null, ?array $request=null)
+    public function __construct(LoggerInterface $logger, ?array $request=null, ?ContainerInterface $container=null)
     {
         $this->logger = $logger;
         $this->container = $container;
