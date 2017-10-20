@@ -154,6 +154,22 @@ class Container implements ContainerInterface
 
 
     /**
+     * Get new instance (Do not store in container)
+     *
+     * @param  string $name
+     * @return mixed
+     */
+    public function getNew(string $name)
+    {
+        if(isset($this->registry[$name])) {
+            return $this->registry[$name]->call($this);
+        } else {
+            return $this->autoWire($name);
+        }
+    }
+
+
+    /**
      * Add service
      *
      * @param  string $name
