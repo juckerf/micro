@@ -30,15 +30,15 @@ abstract class AbstractAdapter implements AdapterInterface
      * @var int
      */
     protected $attr_sync_cache = 0;
-    
-    
+
+
     /**
      * attribute map
      *
      * @var Iterable
      */
     protected $map = [];
-   
+
 
     /**
      * Logger
@@ -47,20 +47,6 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     protected $logger;
 
-
-    /**
-     * Init adapter
-     *
-     * @param   Logger $logger
-     * @param   Iterable $config
-     * @return  void
-     */
-    public function __construct(Logger $logger, ?Iterable $config=null)
-    {
-        $this->logger = $logger;
-        $this->setOptions($config);
-    }
-    
 
     /**
      * Get attribute sync cache
@@ -84,22 +70,22 @@ abstract class AbstractAdapter implements AdapterInterface
         if ($config === null) {
             return $this;
         }
-        
+
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'map':
                     $this->map = $value;
                 break;
-                
+
                 case 'attr_sync_cache':
                     $this->attr_sync_cache = (int)$value;
                 break;
             }
         }
-        
+
         return $this;
     }
-    
+
 
     /**
      * Get identifier
@@ -111,7 +97,7 @@ abstract class AbstractAdapter implements AdapterInterface
         return $this->identifier;
     }
 
-    
+
     /**
      * Get attribute map
      *

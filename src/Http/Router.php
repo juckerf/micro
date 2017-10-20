@@ -12,10 +12,11 @@ declare(strict_types = 1);
 namespace Micro\Http;
 
 use \Micro\Helper;
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Micro\Http\Router\Route;
 use \ReflectionMethod;
 use \ReflectionException;
+use \Psr\Container\ContainerInterface;
 
 class Router
 {
@@ -52,28 +53,39 @@ class Router
 
 
     /**
+     * DI container
+     *
+     * @var ContainerInterface
+     */
+    protected $container;
+
+
+    /**
      * Init router
      *
-     * @param   Logger $logger
+     * @param   LoggerInterface $logger
+     * @param   ContainerInterface $container
      * @param   array $request
      * @return  void
      */
-    public function __construct(Logger $logger, ?array $request=null)
+    public function __construct(LoggerInterface $logger, ?array $request=null, ?ContainerInterface $container=null)
     {
         $this->logger = $logger;
+        $this->container = $container;
 
         if($request === null) {
             $request = $_SERVER;
-        }        
+        }
 
         if (isset($request['PATH_INFO'])) {
             $this->setPath($request['PATH_INFO']);
         }
-        
+
         if (isset($request['REQUEST_METHOD'])) {
             $this->setVerb($request['REQUEST_METHOD']);
         }
     }
+
 
     /**
      * Add route to the beginning of the routing table
@@ -102,7 +114,7 @@ class Router
         return $this;
     }
 
-    
+
     /**
      * Clear routing table
      *
@@ -114,7 +126,7 @@ class Router
         return $this;
     }
 
-    
+
     /**
      * Get active routes
      *
@@ -124,8 +136,8 @@ class Router
     {
         return $this->routes;
     }
-    
-    
+
+
     /**
      * Set HTTP verb
      *
@@ -173,7 +185,7 @@ class Router
     {
         return $this->path;
     }
- 
+
 
     /**
      * Build method name
@@ -196,21 +208,20 @@ class Router
     /**
      * Execute router
      *
-     * @param  array $constructor
      * @return bool
      */
-    public function run(array $constructor = []): bool
+    public function run(): bool
     {
         $this->logger->info('execute requested route ['.$this->path.']', [
             'category' => get_class($this),
         ]);
-        
+
         try {
             $match = false;
             foreach ($this->routes as $key => $route) {
                 if ($route->match()) {
-                    $callable = $route->getCallable($constructor);
-                    
+                    $callable = $route->getCallable($this->container);
+
                     if (is_callable($callable)) {
                         $match = true;
                         $this->logger->info('found matching route, execute ['.$route->getClass().'::'.$callable[1].']', [
@@ -219,7 +230,7 @@ class Router
 
                         $params = $this->getParams($route->getClass(), $callable[1], $route->getParams());
                         $response = call_user_func_array($callable, $params);
-                        
+
                         if (!$route->continueAfterMatch()) {
                             break;
                         }
@@ -234,7 +245,7 @@ class Router
                     ]);
                 }
             }
-            
+
             if ($match === false) {
                 throw new Exception($this->verb.' '.$this->path.' could not be routed, no matching routes found');
             } else {
@@ -267,19 +278,27 @@ class Router
     public function sendException(\Exception $exception): void
     {
         $message = $exception->getMessage();
+        $class = get_class($exception);
+
         $msg = [
-            'error'   => get_class($exception),
+            'error'   => $class,
             'message' => $message,
             'code'    => $exception->getCode()
         ];
+
+        if(defined("$class::HTTP_CODE")) {
+            $http_code = $class::HTTP_CODE;
+        } else {
+            $http_code = 500;
+        }
 
         $this->logger->error('uncaught exception '.$message.']', [
             'category' => get_class($this),
             'exception' => $exception,
         ]);
-        
+
         (new Response())
-            ->setCode(500)
+            ->setCode($http_code)
             ->setBody($msg)
             ->send();
     }
@@ -301,7 +320,7 @@ class Router
             $meta        = new ReflectionMethod($class, $method);
             $params      = $meta->getParameters();
             $json_params = [];
-            
+
             if (isset($_SERVER['CONTENT_TYPE']) && $_SERVER['CONTENT_TYPE'] == 'application/json') {
                 $body = file_get_contents('php://input');
                 if (!empty($body)) {
@@ -320,7 +339,7 @@ class Router
             } else {
                 $request_params = array_merge($parsed_params, $_REQUEST);
             }
-            
+
             foreach ($params as $param) {
                 if ($optional = $param->isOptional()) {
                     $default = $param->getDefaultValue();
@@ -348,7 +367,7 @@ class Router
                     throw new Exception('misssing required parameter '.$param->name);
                 }
             }
-            
+
             return $return;
         } catch (ReflectionException $e) {
             throw new Exception('misssing or invalid required request parameter');

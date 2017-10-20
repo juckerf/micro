@@ -16,16 +16,6 @@ use \Micro\Config;
 interface ConfigInterface
 {
     /**
-     * Load
-     *
-     * @param  string $config
-     * @param  string $env
-     * @return void
-     */
-    public function __construct(string $config, string $env);
-
-
-    /**
      * Get from config
      *
      * @param   string $name

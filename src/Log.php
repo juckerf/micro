@@ -18,8 +18,9 @@ use \Micro\Log\Adapter\AbstractAdapter;
 use \Micro\Log\Adapter\AdapterInterface;
 use \Micro\Config;
 use \Micro\Log\Exception;
+use \Micro\Container\AdapterAwareInterface;
 
-class Log extends AbstractLogger implements LoggerInterface
+class Log extends AbstractLogger implements LoggerInterface, AdapterAwareInterface
 {
     /**
      * Priorities
@@ -91,7 +92,7 @@ class Log extends AbstractLogger implements LoggerInterface
                 $this->addAdapter($option, $value['class'], $value['config']);
             }
         }
-        
+
         return $this;
     }
 
@@ -121,7 +122,7 @@ class Log extends AbstractLogger implements LoggerInterface
         if ($this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is already registered');
         }
-            
+
         $adapter = new $class($config);
         if (!($adapter instanceof AdapterInterface)) {
             throw new Exception('log adapter must include AdapterInterface interface');
@@ -143,7 +144,7 @@ class Log extends AbstractLogger implements LoggerInterface
         if ($this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is already registered');
         }
-            
+
         $this->adapter[$name] = $adapter;
         return $adapter;
     }
@@ -151,7 +152,7 @@ class Log extends AbstractLogger implements LoggerInterface
 
     /**
      * Get adapter
-     *      
+     *
      * @param  string $name
      * @return AdapterInterface
      */
@@ -167,7 +168,7 @@ class Log extends AbstractLogger implements LoggerInterface
 
     /**
      * Get adapters
-     *      
+     *
      * @param  array $adapters
      * @return array
      */
@@ -188,7 +189,7 @@ class Log extends AbstractLogger implements LoggerInterface
         }
     }
 
-    
+
     /**
      * Log message
      *
@@ -205,7 +206,7 @@ class Log extends AbstractLogger implements LoggerInterface
 
         foreach ($this->adapter as $adapter) {
             $prio = $adapter->getLevel();
- 
+
             if (self::PRIORITIES[$level] <= $prio) {
                 $msg = $this->_format($message, $adapter->getFormat(), $adapter->getDateFormat(), $level, $context);
                 $adapter->log($level, $msg);
@@ -214,7 +215,7 @@ class Log extends AbstractLogger implements LoggerInterface
 
         return true;
     }
-  
+
 
     /**
      *  Add static context
@@ -245,7 +246,7 @@ class Log extends AbstractLogger implements LoggerInterface
         $parsed = preg_replace_callback('/(\{(([a-z]\.*)+)\})/', function($match) use ($message, $level, $date_format, $context) {
             $key = '';
             $context = array_merge($this->context, $context);
-                    
+
             if ($sub_context = strpos($match[2], '.')) {
                 $parts = explode('.', $match[2]);
                 $name = $parts[0];
@@ -253,7 +254,7 @@ class Log extends AbstractLogger implements LoggerInterface
             } else {
                 $name = $match[2];
             }
-            
+
             switch ($name) {
                 case 'level':
                     return $match[0] = $level;
@@ -288,7 +289,7 @@ class Log extends AbstractLogger implements LoggerInterface
                     break;
             }
         }, $format);
-        
+
         return $parsed;
     }
 }
