@@ -28,8 +28,8 @@ class Response
      * Possible output formats
      */
     const OUTPUT_FORMATS = [
-        'json' => 'application/json; charset=utf-8', 
-        'xml'  => 'application/xml; charset=utf-8', 
+        'json' => 'application/json; charset=utf-8',
+        'xml'  => 'application/xml; charset=utf-8',
         'text' => 'text/html; charset=utf-8'
     ];
 
@@ -97,7 +97,7 @@ class Response
         $this->headers[$header] = $value;
         return $this;
     }
-    
+
 
     /**
      * Delete header
@@ -125,7 +125,7 @@ class Response
         return $this->headers;
     }
 
-    
+
     /**
      * Send headers
      *
@@ -139,7 +139,7 @@ class Response
 
         return $this;
     }
-    
+
 
     /**
      * Set response code
@@ -152,11 +152,11 @@ class Response
         if (!array_key_exists($code, Http::STATUS_CODES)) {
             throw new Exception('invalid http code set');
         }
-        
+
         $this->code = $code;
         return $this;
     }
-    
+
 
     /**
      * Get response code
@@ -167,7 +167,7 @@ class Response
     {
         return $this->code;
     }
- 
+
 
     /**
      * Set body
@@ -181,11 +181,11 @@ class Response
         $this->body = $body;
         $this->body_only = $body_only;
         $this->setOutputFormat($this->output_format);
-        
+
         return $this;
     }
 
-    
+
     /**
      * Get body
      *
@@ -211,19 +211,19 @@ class Response
         if ($this->body === null && $this->code == 204) {
             $this->terminate();
         }
-        
+
         if($this->body instanceof Closure) {
             $body = $this->body->call($this);
         } else {
             $body = $this->body;
         }
-            
+
         if ($this->body_only === false && $this->output_format !== 'text') {
             $body = ['data' => $body];
             $body['status'] = intval($this->code);
             $body = array_reverse($body, true);
         }
-        
+
         switch ($this->output_format) {
             case null:
             break;
@@ -232,7 +232,7 @@ class Response
             case 'json':
                 echo $this->asJSON($body);
             break;
-            
+
             case 'xml':
                 echo $this->asXML($body);
             break;
@@ -242,7 +242,7 @@ class Response
             break;
         }
 
-        $this->terminate();
+        //$this->terminate();
     }
 
 
@@ -339,7 +339,7 @@ class Response
     {
         $root = new Config('<response></response>');
         $raw = $this->toXML($body, $root, 'node');
-        
+
         if ($this->pretty_format) {
             $raw = $this->prettyXml($raw);
         }
@@ -388,7 +388,7 @@ class Response
         return $this;
     }
 
-    
+
     /**
      * Abort after response
      *
