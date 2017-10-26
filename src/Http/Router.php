@@ -273,9 +273,9 @@ class Router
      * Sends a exception response to the client
      *
      * @param   \Exception $exception
-     * @return  void
+     * @return  bool
      */
-    public function sendException(\Exception $exception): void
+    public function sendException(\Exception $exception): bool
     {
         $message = $exception->getMessage();
         $class = get_class($exception);
@@ -301,6 +301,8 @@ class Router
             ->setCode($http_code)
             ->setBody($msg)
             ->send();
+
+        return true;
     }
 
 
