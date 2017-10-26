@@ -20,7 +20,8 @@ class Environment implements ConfigInterface
      *
      * @var string
      */
-    private const DELIMITER = '_';
+    const DEFAULT_DELIMITER = '_';
+
 
     /**
      * Store
@@ -29,17 +30,42 @@ class Environment implements ConfigInterface
      */
     private $store;
 
+
+    /**
+     * Variable delimiter
+     *
+     * @var string
+     */
+    protected $delimiter = self::DEFAULT_DELIMITER;
+
+
+    /**
+     * Variable prefix
+     *
+     * @var string
+     */
+    protected $prefix;
+
+
     /**
      * Load config
      *
-     * @param  string $config
-     * @param  string $env
+     * @param  string $prefix
+     * @param  string $delimiter
+     * @param  array $variables
      * @return void
      */
-    public function __construct(string $config = null, string $env = null)
+    public function __construct(?string $prefix=null, $delimiter=self::DEFAULT_DELIMITER, array $variables=[])
     {
-        $this->store = $this->variablesToTree(array_merge($_ENV, $_SERVER));
-    }
+        $this->delimiter = $delimiter;
+        $this->prefix = strtolower($prefix);
+
+        if(count($variables) === 0) {
+            $this->store = $this->variablesToTree(array_merge($_ENV, $_SERVER));
+        } else {
+            $this->store = $this->variablesToTree($variables);
+        }
+   }
 
 
     /**
@@ -55,50 +81,50 @@ class Environment implements ConfigInterface
 
 
     /**
-     * Get native config format as config instance
+     * Return map
      *
-     * @param   array $environmentVariables
      * @return  Config
      */
-    public function map($environmentVariables = null): Config
+    public function map(): Config
     {
-        if ($environmentVariables === null) {
-            return $this->store;
-        }
-        return $this->variablesToTree($environmentVariables);
+        return $this->store;
     }
 
 
     /**
      * Transform array of environment variables into a tree
      *
-     * @param   array $environmentVars
+     * @param   array $variables
      * @return  Config
      */
-    protected function variablesToTree(array $environmentVars): Config
+    protected function variablesToTree(array $variables): Config
     {
-        // transform keys to lowercase
-        $environmentVars = array_change_key_case($environmentVars);
+        $variables = array_change_key_case($variables);
 
-        // initialize root node
         $root = new Config();
-        foreach ($environmentVars as $name => $value) {
-            // split variable name by delimiter
-            $name = explode(self::DELIMITER, $name);
+        foreach ($variables as $name => $value) {
+            $name = explode($this->delimiter, $name);
 
-            // go back to root
+            if($this->prefix !== null) {
+                if($name[0] !== $this->prefix) {
+                    continue;
+                } else {
+                    array_shift($name);
+                }
+            }
+
             $tree = $root;
 
-            // iterate over key parts
+
             for ($i = 0; $i < count($name); $i++) {
                 $key = $name[$i];
 
-                // try to access subtree
                 try {
                   // create new subtree if requested subtree already has a value
-                  if (!is_a($tree->$key, '\Micro\Config')) {
+                  if (!($tree->$key instanceof Config)) {
                       $tree[$key] = new Config([$tree->$key]);
                   }
+
                   $tree = $tree->$key;
                 } catch (Exception $e) {
                     // set value if last keypart or create subtree

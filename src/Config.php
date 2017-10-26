@@ -16,6 +16,7 @@ use \Micro\Config\ConfigInterface;
 use \Iterator;
 use \ArrayAccess;
 use \Countable;
+use \InvalidArgumentException;
 
 class Config implements ArrayAccess, Iterator, Countable
 {
@@ -24,7 +25,7 @@ class Config implements ArrayAccess, Iterator, Countable
      *
      * @var array
      */
-    protected $store = [];
+    protected $_store = [];
 
 
     /**
@@ -41,18 +42,45 @@ class Config implements ArrayAccess, Iterator, Countable
      * @param   string $config
      * @return  void
      */
-    public function __construct($config = [])
+    public function __construct(?ConfigInterface $config=null)
     {
-        if ($config instanceof ConfigInterface) {
-            $this->store = $config->map();
-        } elseif (is_array($config)) {
-            $this->store = $config;
-        } elseif ($config !== null) {
-            throw new Exception('first param needs to be an instance of ConfigInterface or an array');
+        if($config !== null) {
+            $this->config = $config->map();
         }
     }
 
-    
+
+    /**
+     * Inject config adapter
+     *
+     * @param  ConfigInterface $config
+     * @return Config
+     */
+    public function inject(ConfigInterface $config): Config
+    {
+        return $this->merge($config->map());
+    }
+
+
+    /**
+     * Merge
+     *
+     * @return Config
+     */
+    public function merge(Config $from): Config
+    {
+        foreach($from as $key => $value) {
+            if(isset($this->_store[$key]) && $this->_store[$key] instanceof Config) {
+                $this->_store[$key]->merge($value);
+            } else {
+                $this->_store[$key] = $value;
+            }
+        }
+
+        return $this;
+    }
+
+
     /**
      * Count
      *
@@ -60,7 +88,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function count()
     {
-        return count($this->store);
+        return count($this->_store);
     }
 
     /**
@@ -70,7 +98,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function children()
     {
-        return $this->store;
+        return $this->_store;
     }
 
 
@@ -82,8 +110,8 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function __get($key)
     {
-        if (isset($this->store[$key])) {
-            return $this->store[$key];
+        if (isset($this->_store[$key])) {
+            return $this->_store[$key];
         } else {
             throw new Exception('requested config key '.$key.' is not available');
         }
@@ -92,17 +120,17 @@ class Config implements ArrayAccess, Iterator, Countable
 
     /**
      * Set offset
-     *  
+     *
      * @param  int $offset
      * @param  mixed $value
      * @return void
      */
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
-            $this->store[] = $value;
+        if ($offset === null) {
+            $this->_store[] = $value;
         } else {
-            $this->store[$offset] = $value;
+            $this->_store[$offset] = $value;
         }
     }
 
@@ -115,7 +143,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function offsetExists($offset)
     {
-        return isset($this->store[$offset]);
+        return isset($this->_store[$offset]);
     }
 
 
@@ -127,7 +155,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function offsetUnset($offset)
     {
-        unset($this->store[$offset]);
+        unset($this->_store[$offset]);
     }
 
 
@@ -139,7 +167,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function offsetGet($offset)
     {
-        return isset($this->store[$offset]) ? $this->store[$offset] : null;
+        return isset($this->_store[$offset]) ? $this->_store[$offset] : null;
     }
 
     /**
@@ -149,7 +177,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function rewind()
     {
-        reset($this->store);
+        reset($this->_store);
     }
 
 
@@ -160,7 +188,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function current()
     {
-        return current($this->store);
+        return current($this->_store);
     }
 
 
@@ -171,7 +199,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function key()
     {
-        return key($this->store);
+        return key($this->_store);
     }
 
 
@@ -182,7 +210,7 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function next()
     {
-        next($this->store);
+        next($this->_store);
     }
 
 
@@ -193,6 +221,6 @@ class Config implements ArrayAccess, Iterator, Countable
      */
     public function valid()
     {
-        return key($this->store) !== null;
+        return key($this->_store) !== null;
     }
 }

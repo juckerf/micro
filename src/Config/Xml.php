@@ -37,12 +37,12 @@ class Xml implements ConfigInterface
         if ($this->store === false) {
             throw new Exception('failed load xml configuration');
         }
-        
+
         $store = (array)$config->children();
         if (!isset($store[$env])) {
             throw new Exception('env '.$env.' is not configured');
         }
-        
+
         $config = $store[$env];
 
         foreach ($store as $reg) {
@@ -59,7 +59,7 @@ class Xml implements ConfigInterface
                 if (count($found) !== 1) {
                     throw new Exception('inherits '.$xpath.' not found');
                 }
-                
+
                 unset($node->attributes()->inherits);
                 $found = array_shift($found);
 
@@ -68,7 +68,7 @@ class Xml implements ConfigInterface
                 $this->appendSimplexml($node, $temp);
             }
         }
-        
+
         $attrs = $store[$env]->attributes();
         if (isset($attrs['inherits'])) {
             if (!isset($store[(string)$attrs['inherits']])) {
@@ -77,7 +77,7 @@ class Xml implements ConfigInterface
                 $this->appendSimplexml($store[(string)$attrs['inherits']], $config);
             }
         }
-        
+
         $this->store = $config;
     }
 
@@ -97,7 +97,7 @@ class Xml implements ConfigInterface
                 $simplexml_to[0] = htmlspecialchars((string)$simplexml_from);
             }
         }
-            
+
         $attrs = $simplexml_to->attributes();
         foreach ($simplexml_from->attributes() as $attr_key => $attr_value) {
             if (!isset($attrs[$attr_key])) {
@@ -142,7 +142,7 @@ class Xml implements ConfigInterface
         return $this->store;
     }
 
-    
+
     /**
      * Get from config
      *
@@ -165,11 +165,11 @@ class Xml implements ConfigInterface
     {
         $merge = $config->getRaw();
         $this->appendSimplexml($this->store, $merge);
-        
+
         $result = $this->store->xpath('//*[@reference]');
         while (list(, $node) = each($result)) {
             $path = (string)$node->attributes()->reference;
-            
+
             if ($path === '') {
                 continue;
             }
@@ -183,7 +183,7 @@ class Xml implements ConfigInterface
             $found = array_shift($found);
             $this->appendSimplexml($node, $found);
         }
-        
+
         return $this;
     }
 

@@ -29,5 +29,5 @@ interface ConfigInterface
      *
      * @return  Config
      */
-    public function map($native = null): Config;
+    public function map(): Config;
 }
