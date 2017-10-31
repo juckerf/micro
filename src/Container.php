@@ -48,7 +48,7 @@ class Container implements ContainerInterface
      *
      * @param array $config
      */
-    public function __construct(array $config=[])
+    public function __construct(Iterable $config=[])
     {
         $this->flattenConfig($config);
         $container = $this;
@@ -83,6 +83,8 @@ class Container implements ContainerInterface
                 'name' => $name
             ];
 
+            $new_parent = $parent.'.'.$name;
+
             foreach($service as $option => $value) {
                 switch($option) {
 
@@ -96,9 +98,9 @@ class Container implements ContainerInterface
                     break;
 
                     case 'service':
-                        $flat[$id]['parent'] = $parent;
-                        $parent = $parent.'.'.$name;
-                        $services = $this->flattenConfig($service['service'], $parent);
+                        $flat[$id]['parent'] = $new_parent;
+                        //$parent = $parent.'.'.$name;
+                        $services = $this->flattenConfig($service['service'], $new_parent);
                         $flat[$id]['service'] = [];
                         foreach($services as $key => $sub) {
                             $flat[$id]['service'][$sub['name']] = $key;
@@ -106,7 +108,7 @@ class Container implements ContainerInterface
                     break;
 
                     case 'adapter':
-                        $flat[$id]['adapter'] = $this->flattenConfig($service['adapter']);
+                        $flat[$id]['adapter'] = $this->flattenConfig($service['adapter']/*, $new_parent*/);
                     break;
 
                     default:
