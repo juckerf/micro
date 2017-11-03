@@ -94,6 +94,7 @@ class Oidc extends AbstractAdapter
                 case 'token_validation_url':
                 case 'identity_attribute':
                     $this->{$option} = (string)$value;
+                    unset($config[$option]);
                 break;
             }
         }

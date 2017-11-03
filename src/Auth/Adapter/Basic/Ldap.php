@@ -12,12 +12,12 @@ declare(strict_types = 1);
 namespace Micro\Auth\Adapter\Basic;
 
 use \Micro\Auth\Exception;
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Micro\Ldap as LdapServer;
 use \Micro\Auth\Adapter\AdapterInterface;
 use \Micro\Auth\Adapter\AbstractAdapter;
 
-class Ldap extends AbstractAdapter
+class Ldap extends AbstractBasic
 {
     /**
      * Ldap
@@ -43,6 +43,14 @@ class Ldap extends AbstractAdapter
     protected $account_filter = '(uid=%s)';
 
 
+    public function __construct(LdapServer $ldap, LoggerInterface $logger, ?Iterable $config=null)
+    {
+        $this->logger = $logger;
+        $this->ldap = $ldap;
+        $this->setOptions($config);
+    }
+
+
     /**
      * Set options
      *
@@ -57,58 +65,16 @@ class Ldap extends AbstractAdapter
 
         foreach ($config as $option => $value) {
             switch ($option) {
-                case 'ldap':
-                    $this->ldap = new LdapServer($value, $this->logger);
-                break;
-
                 case 'account_filter':
                     $this->account_filter = $value;
+                    unset($config[$option]);
                 break;
             }
         }
 
-        if (!isset($config['ldap'])) {
-            $this->ldap = new LdapServer();
-        }
+        parent::setOptions($config);
 
-        return parent::setOptions($config);
-    }
-
-
-    /**
-     * Authenticate
-     *
-     * @return bool
-     */
-    public function authenticate(): bool
-    {
-        if (!isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            $this->logger->debug('skip auth adapter ['.get_class($this).'], no http authorization header found', [
-                'category' => get_class($this)
-            ]);
-
-            return false;
-        }
-
-        $header = $_SERVER['HTTP_AUTHORIZATION'];
-        $parts  = explode(' ', $header);
-
-        if ($parts[0] == 'Basic') {
-            $this->logger->debug('found http basic authorization header', [
-                'category' => get_class($this)
-            ]);
-
-            $username = $_SERVER['PHP_AUTH_USER'];
-            $password = $_SERVER['PHP_AUTH_PW'];
-
-            return $this->plainAuth($username, $password);
-        } else {
-            $this->logger->warning('http authorization header contains no basic string or invalid authentication string', [
-                'category' => get_class($this)
-            ]);
-
-            return false;
-        }
+        return $this;
     }
 
 

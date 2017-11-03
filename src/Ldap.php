@@ -12,7 +12,7 @@ declare(strict_types = 1);
 namespace Micro;
 
 use \Micro\Ldap\Exception;
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 
 class Ldap
 {
@@ -54,7 +54,7 @@ class Ldap
      * @var string
      */
     protected $bindpw;
-    
+
 
     /**
      * Basedn
@@ -87,7 +87,7 @@ class Ldap
      * @param   Logger $logger
      * @return  resource
      */
-    public function __construct(? Iterable $config, Logger $logger)
+    public function __construct(LoggerInterface $logger, ?Iterable $config=null)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -101,12 +101,16 @@ class Ldap
      */
     public function connect(): Ldap
     {
+        $this->logger->debug('connect to ldap server ['.$this->uri.']', [
+            'category' => get_class($this),
+        ]);
+
         if ($this->binddn === null) {
             $this->logger->warning('no binddn set for ldap connection, you should avoid anonymous bind', [
                 'category' => get_class($this),
             ]);
         }
-        
+
         if ($this->tls === false && substr($this->uri, 0, 5) !== 'ldaps') {
             $this->logger->warning('neither tls nor ldaps enabled for ldap connection, it is strongly reccommended to encrypt ldap connections', [
                 'category' => get_class($this),
@@ -159,7 +163,7 @@ class Ldap
         return true;
     }
 
-    
+
     /**
      * Set options
      *
@@ -180,10 +184,10 @@ class Ldap
                 case 'options':
                     $this->options = $value;
                     break;
-                case 'username':
+                case 'binddn':
                     $this->binddn = (string)$value;
                     break;
-                case 'password':
+                case 'bindpw':
                     $this->bindpw = (string)$value;
                     break;
                 case 'basedn':
@@ -192,13 +196,15 @@ class Ldap
                 case 'tls':
                     $this->tls = (bool)(int)$value;
                     break;
+                default:
+                    throw new Exception('unknown option '.$option.' given');
             }
         }
-    
+
         return $this;
     }
 
-    
+
     /**
      * Get base
      *
@@ -220,7 +226,7 @@ class Ldap
         if (!is_resource($this->connection)) {
             $this->connect();
         }
-    
+
         return $this->connection;
     }
 }

@@ -38,16 +38,7 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     protected $level = 7;
 
-    
-    /**
-     * Logger
-     *
-     * @param   string $level
-     * @param   string $log
-     */
-    abstract public function log(string $level, string $log): bool;
 
-    
     /**
      * Create adapter
      *
@@ -77,8 +68,8 @@ abstract class AbstractAdapter implements AdapterInterface
     {
         return $this->date_format;
     }
-   
- 
+
+
     /**
      * Get level
      *
@@ -88,7 +79,7 @@ abstract class AbstractAdapter implements AdapterInterface
     {
         return $this->level;
     }
-    
+
 
     /**
      * Set options
@@ -101,23 +92,23 @@ abstract class AbstractAdapter implements AdapterInterface
             return $this;
         }
 
-        foreach ($config as $attr => $val) {
-            switch ($attr) {
+        foreach ($config as $option => $value) {
+            switch ($option) {
+                case 'date_format':
                 case 'format':
-                    $this->format = (string)$val;
+                    $this->{$option} = (string)$value;
                 break;
-               
+
                 case 'level':
-                    if (!is_numeric($val)) {
+                    if (!is_numeric($value)) {
                         throw new Exception('log level must be a number');
                     }
 
-                    $this->level = (int)$val;
+                    $this->level = (int)$value;
                 break;
-                
-                case 'date_format':
-                    $this->date_format = (string)$val;
-                break;
+
+                default:
+                    throw new Exception('invalid option '.$option.' given');
             }
         }
 

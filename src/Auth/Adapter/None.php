@@ -29,7 +29,7 @@ class None extends AbstractAdapter
     /**
      * Get identifier
      *
-     * @return string 
+     * @return string
      */
     public function getIdentifier(): string
     {

@@ -20,7 +20,7 @@ class File extends AbstractAdapter
      */
     protected $file = '/tmp/out.log';
 
-    
+
     /**
      * Filename
      *
@@ -28,7 +28,7 @@ class File extends AbstractAdapter
      */
     protected $resource;
 
-    
+
     /**
      * Set options
      *
@@ -36,26 +36,27 @@ class File extends AbstractAdapter
      */
     public function setOptions(? Iterable $config = null) : AdapterInterface
     {
-        parent::setOptions($config);
-
         if ($config === null) {
             $this->resource = fopen($this->file, 'a');
             return $this;
         }
 
-        foreach ($config as $attr => $val) {
-            switch ($attr) {
+        foreach ($config as $option => $value) {
+            switch ($option) {
                 case 'file':
-                    $this->file = str_replace('APPLICATION_PATH', APPLICATION_PATH, (string)$val);
+                    $this->file = str_replace('APPLICATION_PATH', APPLICATION_PATH, (string)$value);
+                    unset($config[$option]);
                 break;
             }
         }
+
+        parent::setOptions($config);
 
         $this->resource = fopen($this->file, 'a');
         return $this;
     }
 
-    
+
     /**
      * Log
      *

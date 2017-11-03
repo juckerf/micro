@@ -13,6 +13,7 @@ namespace Micro\Auth\Adapter;
 
 use \Psr\Log\LoggerInterface as Logger;
 use \Micro\Auth\Adapter\AdapterInterface;
+use \Micro\Auth\Exception;
 
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -80,6 +81,9 @@ abstract class AbstractAdapter implements AdapterInterface
                 case 'attr_sync_cache':
                     $this->attr_sync_cache = (int)$value;
                 break;
+
+                default:
+                    throw new Exception('unknown option '.$option.' given');
             }
         }
 

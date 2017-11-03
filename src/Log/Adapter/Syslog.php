@@ -11,6 +11,9 @@ declare(strict_types = 1);
 
 namespace Micro\Log\Adapter;
 
+use Micro\Log;
+use Micro\Log\Adapter\AdapterInterface;
+
 class Syslog extends AbstractAdapter
 {
     /**
@@ -42,27 +45,30 @@ class Syslog extends AbstractAdapter
      *
      * @return  AdapterInterface
      */
-    public function setOptions(? Iterable $config = null)
+    public function setOptions(? Iterable $config = null): AdapterInterface
     {
-        parent::setOptions($options);
-
-        if ($options === null) {
+        if ($config === null) {
             return $this;
         }
 
-        foreach ($options as $attr => $val) {
-            switch ($attr) {
+        foreach ($config as $option => $value) {
+            switch ($option) {
                 case 'ident':
-                    $this->ident = (string)$val;
+                    $this->ident = (string)$value;
+                    unset($config[$option]);
                 break;
                 case 'option':
-                    $this->option = (int)(string)$val;
+                    $this->option = (int)(string)$value;
+                    unset($config[$option]);
                 break;
                 case 'facility':
-                    $this->facility = (string)$val;
+                    $this->facility = (string)$value;
+                    unset($config[$option]);
                 break;
             }
         }
+
+        parent::setOptions($config);
 
         openlog($this->ident, $this->option, $this->facility);
 
@@ -79,6 +85,6 @@ class Syslog extends AbstractAdapter
      */
     public function log(string $level, string $message): bool
     {
-        return syslog($level, $message);
+        return syslog(Log::PRIORITIES[$level], $message);
     }
 }

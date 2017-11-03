@@ -27,20 +27,6 @@ abstract class AbstractBasic extends AbstractAdapter
 
 
     /**
-     * Init adapter
-     *
-     * @param   LoggerInterface $logger
-     * @param   Iterable $config
-     * @return  void
-     */
-    public function __construct(LoggerInterface $logger, ?Iterable $config=null)
-    {
-        $this->logger = $logger;
-        $this->setOptions($config);
-    }
-
-
-    /**
      * Authenticate
      *
      * @return bool
@@ -75,56 +61,6 @@ abstract class AbstractBasic extends AbstractAdapter
             return false;
         }
     }
-
-
-    /**
-     * Auth
-     *
-     * @param   string $username
-     * @param   string $password
-     * @return  bool
-     */
-    protected function plainAuth(string $username, string $password): bool
-    {
-        $result = $this->findIdentity($username);
-
-        if ($result === null) {
-            $this->logger->info('found no user named ['.$username.'] in database', [
-                'category' => get_class($this)
-            ]);
-
-            return false;
-        }
-
-        if (!isset($result['password']) || empty($result['password'])) {
-            $this->logger->info('found no password for ['.$username.'] in database', [
-                'category' => get_class($this)
-            ]);
-
-            return false;
-        }
-
-        if (!password_verify($password, $result['password'])) {
-            $this->logger->info('failed match given password for ['.$username.'] with stored hash in database', [
-                'category' => get_class($this)
-            ]);
-
-            return false;
-        }
-
-        $this->attributes = $result;
-        $this->identifier = $username;
-        return true;
-    }
-
-
-    /**
-     * Find Identity
-     *
-     * @param  string $username
-     * @return array
-     */
-    protected abstract function findIdentity(string $username): ?array;
 
 
     /**

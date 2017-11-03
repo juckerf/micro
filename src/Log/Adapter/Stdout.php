@@ -69,16 +69,14 @@ class Stdout extends AbstractAdapter
     {
         $colored_string = "";
 
-        // Check if given foreground color found
         if (isset($this->foreground_colors[$foreground_color])) {
             $colored_string .= "\033[".$this->foreground_colors[$foreground_color]."m";
         }
-        // Check if given background color found
+
         if (isset($this->background_colors[$background_color])) {
             $colored_string .= "\033[".$this->background_colors[$background_color]."m";
         }
 
-        // Add string and end coloring
         $colored_string .= $string."\033[0m";
 
         return $colored_string;
@@ -102,7 +100,7 @@ class Stdout extends AbstractAdapter
             case LogLevel::ALERT:
                 $message = '['.$this->getColoredString('ALERT', 'red').']'."\t".$message;
             break;
-            
+
             case LogLevel::CRITICAL:
                 $message = '['.$this->getColoredString('CRIT', 'red').']'."\t".$message;
             break;
@@ -127,7 +125,7 @@ class Stdout extends AbstractAdapter
                 $message = '['.$this->getColoredString('DEBUG', 'blue').']'."\t".$message;
             break;
         }
-        
+
         echo $message."\n";
         return true;
     }

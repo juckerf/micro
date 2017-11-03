@@ -17,6 +17,17 @@ use \SimpleXMLElement;
 class Xml implements ConfigInterface
 {
     /**
+     * Config features namespace
+     */
+    const CONFIG_FEATURE_NAMESPACE = 'https://github.com/gyselroth/micro';
+
+    /**
+     * Config features namespace prefix
+     */
+    const CONFIG_FEATURE_NAMESPACE_PREFIX = 'm';
+
+
+    /**
      * Store
      *
      * @var SimpleXML
@@ -46,9 +57,9 @@ class Xml implements ConfigInterface
         $config = $store[$env];
 
         foreach ($store as $reg) {
-            $result = $reg->xpath('/config/'.$reg->getName().'//*[@inherits]');
+            $result = $reg->xpath('/config/'.$reg->getName().'//*[@'.self::CONFIG_FEATURE_NAMESPACE_PREFIX.':inherits]');
             while (list(, $node) = each($result)) {
-                $path = (string)$node->attributes()->inherits;
+                $path = (string)$node->attributes(self::CONFIG_FEATURE_NAMESPACE)->inherits;
 
                 if ($path === '') {
                     continue;
@@ -60,7 +71,7 @@ class Xml implements ConfigInterface
                     throw new Exception('inherits '.$xpath.' not found');
                 }
 
-                unset($node->attributes()->inherits);
+                unset($node->attributes(self::CONFIG_FEATURE_NAMESPACE)->inherits);
                 $found = array_shift($found);
 
                 $temp = clone $found;
@@ -69,7 +80,7 @@ class Xml implements ConfigInterface
             }
         }
 
-        $attrs = $store[$env]->attributes();
+        $attrs = $store[$env]->attributes(self::CONFIG_FEATURE_NAMESPACE);
         if (isset($attrs['inherits'])) {
             if (!isset($store[(string)$attrs['inherits']])) {
                 throw new Exception('parent env '.$attrs['inherits'].' is not configured');
@@ -87,42 +98,38 @@ class Xml implements ConfigInterface
      *
      * @param   SimpleXMLElement $simplexml_to
      * @param   SimpleXMLElement $simplexml_from
-     * @param   bool $replace
      * @return  bool
      */
-    protected function appendSimplexml(SimpleXMLElement&$simplexml_to, SimpleXMLElement&$simplexml_from, bool $replace = true): bool
+    protected function appendSimplexml(SimpleXMLElement&$simplexml_to, SimpleXMLElement&$simplexml_from): bool
     {
         if (count($simplexml_from->children()) === 0) {
-            if ($replace === true && count($simplexml_to->children()) === 0) {
+            if (count($simplexml_to->children()) === 0) {
                 $simplexml_to[0] = htmlspecialchars((string)$simplexml_from);
             }
         }
-
         $attrs = $simplexml_to->attributes();
         foreach ($simplexml_from->attributes() as $attr_key => $attr_value) {
             if (!isset($attrs[$attr_key])) {
                 $simplexml_to->addAttribute($attr_key, (string)$attr_value);
-            } elseif ($replace === true) {
+            } else {
                 $simplexml_to->attributes()->{$attr_key} = (string)$attr_value;
             }
         }
-
         foreach ($simplexml_from->children() as $simplexml_child) {
             if (count($simplexml_child->children()) === 0) {
                 if (!isset($simplexml_to->{$simplexml_child->getName()})) {
                     $simplexml_to->addChild($simplexml_child->getName(), htmlspecialchars((string)$simplexml_child));
-                } elseif($replace === true && count($simplexml_to->{$simplexml_child->getName()}->children()) === 0) {
+                } elseif(count($simplexml_to->{$simplexml_child->getName()}->children()) === 0) {
                     $simplexml_to->{$simplexml_child->getName()} = htmlspecialchars((string)$simplexml_child);
                 }
             } else {
                 $this->appendSimplexml($simplexml_to->{$simplexml_child->getName()}, $simplexml_child, $replace);
             }
-
             $attrs = $simplexml_to->{$simplexml_child->getName()}->attributes();
             foreach ($simplexml_child->attributes() as $attr_key => $attr_value) {
                 if (!isset($attrs[$attr_key])) {
                     $simplexml_to->{$simplexml_child->getName()}->addAttribute($attr_key, (string)$attr_value);
-                } elseif ($replace === true) {
+                } else {
                     $simplexml_to->{$simplexml_child->getName()}->attributes()->{$attr_key} = (string)$attr_value;
                 }
             }
@@ -194,14 +201,18 @@ class Xml implements ConfigInterface
      * @param   SimpleXMLElement $xml
      * @return  Config
      */
-    public function map($xml = null): Config
+    public function map(?SimpleXMLElement $xml = null): Config
     {
         if ($xml === null) {
             $xml = $this->store;
         }
 
         $config = new Config();
-        foreach ($xml->getNamespaces() + array(null) as $prefix => $namespace) {
+        foreach ($xml->getNamespaces() + [null] as $prefix => $namespace) {
+            if($prefix === self::CONFIG_FEATURE_NAMESPACE_PREFIX) {
+                continue;
+            }
+
             foreach ($xml->attributes($namespace) as $key => $value) {
                 if (is_string($prefix)) {
                     $key = $prefix.'.'.$key;
@@ -216,6 +227,10 @@ class Xml implements ConfigInterface
         }
 
         foreach ($xml as $name => $element) {
+            if(isset($element->attributes(self::CONFIG_FEATURE_NAMESPACE)->name)) {
+                $name = (string)$element->attributes(self::CONFIG_FEATURE_NAMESPACE)->name;
+            }
+
             $value = $element->children() ? $this->map($element) : trim((string)$element);
             if ($value || $value === '0') {
                 if (!isset($arr[$name])) {

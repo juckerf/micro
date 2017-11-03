@@ -50,86 +50,11 @@ class Container implements ContainerInterface
      */
     public function __construct(Iterable $config=[])
     {
-        $this->flattenConfig($config);
+        $this->config = $config;
         $container = $this;
         $this->add(ContainerInterface::class, function() use($container){
             return $container;
         });
-    }
-
-
-    /**
-     * Flatten config
-     *
-     * @param  Iterable $config
-     * @param  string $parent
-     * @return array
-     */
-    protected function flattenConfig(Iterable $config, ?string $parent=null): array
-    {
-        $flat = [];
-        foreach($config as $name => $service) {
-            if(isset($service['name']) && $parent === null) {
-                $id = $service['name'];
-           } else {
-                if($parent === null) {
-                    $id = $name;
-                } else {
-                    $id = $parent.'.'.$name;
-                }
-            }
-
-            $flat[$id] = [
-                'name' => $name
-            ];
-
-            $new_parent = $parent.'.'.$name;
-
-            foreach($service as $option => $value) {
-                switch($option) {
-
-                    case 'name' :
-                    case 'use' :
-                        $flat[$id][$option] = $value;
-                    break;
-
-                    case 'options':
-                        $flat[$id][$option] = (array)$value;
-                    break;
-
-                    case 'service':
-                        $flat[$id]['parent'] = $new_parent;
-                        //$parent = $parent.'.'.$name;
-                        $services = $this->flattenConfig($service['service'], $new_parent);
-                        $flat[$id]['service'] = [];
-                        foreach($services as $key => $sub) {
-                            $flat[$id]['service'][$sub['name']] = $key;
-                        }
-                    break;
-
-                    case 'adapter':
-                        $flat[$id]['adapter'] = $this->flattenConfig($service['adapter']/*, $new_parent*/);
-                    break;
-
-                    default:
-                        throw new Exception('invalid container configuration '.$option.' given');
-                }
-            }
-        }
-
-        $this->config = array_merge($this->config, $flat);
-        return $flat;
-    }
-
-
-    /**
-     * Get all services
-     *
-     * @return array
-     */
-    public function getAll(): array
-    {
-        return $this->service;
     }
 
 
@@ -142,14 +67,14 @@ class Container implements ContainerInterface
     public function get($name)
     {
         if($this->has($name)) {
-            return $this->service[$name];
+            return $this->service[$name]['instance'];
         } else {
             if(isset($this->registry[$name])) {
-                $this->service[$name] = $this->registry[$name]->call($this);
+                $this->service[$name]['instance'] = $this->registry[$name]->call($this);
                 unset($this->registry[$name]);
-                return $this->service[$name];
+                return $this->service[$name]['instance'];
             } else {
-                return $this->service[$name] = $this->autoWire($name);
+                return $this->autoWire($name);
             }
         }
     }
@@ -201,19 +126,31 @@ class Container implements ContainerInterface
 
 
     /**
-     * Auto wire service
+     * Auto wire
      *
-     * @param  string $name
+     * @param string $name
+     * @param Iterable $config
+     * @param array $parents
      * @return mixed
      */
-    protected function autoWire(string $name)
+    protected function autoWire(string $name, $config=null, array $parents=[])
     {
-        if(isset($this->config[$name]['use'])) {
-            $class = $this->config[$name]['use'];
-        } elseif(isset($this->config[$name]['name'])) {
-            $class = $this->config[$name]['name'];
+        if($config === null) {
+            $config = $this->config;
+        }
+
+        $class = $name;
+        $sub_config = $config;
+        if(isset($config[$name])) {
+            if(isset($config[$name]['use'])) {
+                $class = $config[$name]['use'];
+            } elseif(isset($config[$name]['name'])) {
+                $class = $config[$name]['name'];
+            }
+
+            $config = $config[$name];
         } else {
-            $class = $name;
+            $config = [];
         }
 
         try {
@@ -236,21 +173,28 @@ class Container implements ContainerInterface
 
                 if($type === null) {
                     try {
-                        $args[$param_name] = $this->getParam($name, $param_name);
+                        $args[$param_name] = $this->getParam($name, $param_name, $sub_config);
                     } catch(Exception $e) {
                         if($param->isDefaultValueAvailable()) {
                             $args[$param_name] = $param->getDefaultValue();
+                        } elseif($param->allowsNull()) {
+                            $args[$param_name] = null;
                         } else {
                             throw $e;
                         }
                     }
                 } else {
                     $type_class = $type->getName();
-                    $args[$param_name] = $this->findParentService($name, $type_class);
+
+                    if($type_class === $name) {
+                        throw new Exception('class '.$type_class.' can not depend on itself');
+                    }
+
+                    $args[$param_name] = $this->findParentService($name, $type_class, $config, $parents);
                }
             }
 
-            return $this->createInstance($name, $reflection, $args);
+            return $this->createInstance($name, $reflection, $args, $config, $parents);
         }
     }
 
@@ -262,15 +206,34 @@ class Container implements ContainerInterface
      * @param  string $class
      * @return mixed
      */
-    protected function findParentService(string $name, string $class)
+    protected function findParentService(string $name, string $class, $config, $parents)
     {
-        if(isset($this->config[$name]['service'][$class])) {
-            return $this->get($this->config[$name]['service'][$class]);
-        } elseif(isset($this->config[$name]['parent'])) {
-            return $this->findParentService($this->config[$name]['parent'], $class);
-        } else {
-            return $this->get($class);
+        $service = null;
+        $services = $this->service;
+        foreach(array_reverse($parents) as $name => $parent) {
+            if(isset($services[$name])) {
+                $service = $services[$name];
+                if(isset($services['service'])) {
+                    $services = $services['service']; }
+                else {
+                    break;
+                }
+            } else {
+                break;
+            }
         }
+
+        if($service !== null) {
+            return $service['instance'];
+        }
+
+        foreach(array_reverse($parents) as $parent) {
+            if(isset($parent['service'][$class])) {
+                return $this->autoWire($class, $parent['service'], $parents);
+            }
+        }
+
+        return $this->get($class);
     }
 
 
@@ -282,21 +245,42 @@ class Container implements ContainerInterface
      * @param  array $args
      * @return mixed
      */
-    protected function createInstance(string $name, ReflectionClass $class, array $args)
+    protected function createInstance(string $name, ReflectionClass $class, array $args, Iterable $config, $parents=[])
     {
         $instance = $class->newInstanceArgs($args);
-        if($instance instanceof AdapterAwareInterface) {
-            if(isset($this->config[$name]['adapter'])) {
-                foreach($this->config[$name]['adapter'] as $adapter => $config) {
-                    if(!isset($config['name'])) {
-                        throw new Exception('adapter requires name configuration');
-                    }
 
-                    if(isset($config['enabled']) && $config['enabled'] === '0') {
+        $loop = &$this->service;
+        foreach($parents as $p => $parent) {
+            $loop = &$loop[$p];
+        }
+        if(count($parents) === 0) {
+            $loop[$name]['instance'] = $instance;
+        }   else {
+            $loop['service'][$name]['instance'] = $instance;
+        }
+
+
+        $parents[$name] = $config;
+        $parents_orig = $parents;
+
+        array_unshift($parents, $name);
+
+        if($instance instanceof AdapterAwareInterface) {
+            if(isset($config['adapter'])) {
+                foreach($config['adapter'] as $adapter => $service) {
+                    if(isset($service['enabled']) && $service['enabled'] === '0') {
                         continue;
                     }
 
-                    $adapter_instance = $this->get($config['name']);
+                    $parents = $parents_orig;
+                    $parents[$adapter] = $service;
+                    $class = $adapter;
+                    $adapter_instance = $this->autoWire($class, $config['adapter'], $parents);
+
+                    if(isset($service['expose']) && $service['expose']) {
+                        $this->service[$adapter]['instance'] = $adapter_instance;
+                    }
+
                     $instance->injectAdapter($adapter, $adapter_instance);
                 }
             }
@@ -313,16 +297,16 @@ class Container implements ContainerInterface
      * @param  string $param
      * @return mixed
      */
-    public function getParam(string $name, string $param)
+    public function getParam(string $name, string $param, ?Iterable $config=null)
     {
-        if(!isset($this->config[$name]) && !isset($this->config[$name]['options'])) {
-            throw new Exception('no configuration available for service '.$name);
+        if($config === null) {
+            $config = $this->config;
         }
 
-        if(!isset($this->config[$name]['options'][$param])) {
-            throw new Exception('no configuration available for service parameter '.$param);
+        if(!isset($config[$name]['options'][$param])) {
+            throw new Exception('no configuration available for required service parameter '.$param);
         }
 
-        return $this->config[$name]['options'][$param];
+        return $config[$name]['options'][$param];
     }
 }

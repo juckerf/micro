@@ -42,12 +42,4 @@ interface AdapterInterface
      * @return int
      */
     public function getLevel(): int;
-
-
-    /**
-     * Set options
-     *
-     * @return  AdapterInterface
-     */
-    public function setOptions(? Iterable $config = null) : AdapterInterface;
 }

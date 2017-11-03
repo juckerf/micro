@@ -45,7 +45,7 @@ class Config implements ArrayAccess, Iterator, Countable
     public function __construct(?ConfigInterface $config=null)
     {
         if($config !== null) {
-            $this->config = $config->map();
+            $this->_store = $config->map()->children();
         }
     }
 
