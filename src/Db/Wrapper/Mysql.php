@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Micro\Db\Wrapper;
 
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Mysqli;
 use \mysqli_stmt;
 use \mysqli_result;
@@ -95,9 +95,9 @@ class Mysql
      * construct
      *
      * @param   Iterable $config
-     * @param   Logger   $logger
+     * @param   LoggerInterface   $logger
      */
-    public function __construct(? Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, LoggerInterface $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -150,7 +150,7 @@ class Mysql
         if ($config === null) {
             return $this;
         }
-        
+
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'host':
@@ -171,6 +171,8 @@ class Mysql
                 case 'charset':
                     $this->charset = (string)$value;
                     break;
+                default:
+                    throw new Exception('invalid option '.$option.' given');
             }
         }
 
@@ -241,7 +243,7 @@ class Mysql
 
     /**
      * Prepare query
-     * 
+     *
      * @param  string $query
      * @param  Iterable $values
      * @return mysqli_stmt
@@ -271,7 +273,7 @@ class Mysql
         if ($stmt->error) {
             throw new Exception($stmt->error);
         }
-        
+
         return $stmt;
     }
 }

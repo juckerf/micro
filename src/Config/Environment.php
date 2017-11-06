@@ -115,7 +115,6 @@ class Environment implements ConfigInterface
 
             $tree = $root;
 
-
             for ($i = 0; $i < count($name); $i++) {
                 $key = $name[$i];
 

@@ -11,7 +11,7 @@ declare(strict_types = 1);
 
 namespace Micro\Db\Wrapper;
 
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Pdo as PdoServer;
 use \PDOStatement;
 
@@ -77,9 +77,9 @@ class Pdo
      * construct
      *
      * @param   Iterable $config
-     * @param   Logger   $logger
+     * @param   LoggerInterface   $logger
      */
-    public function __construct(? Iterable $config, Logger $logger)
+    public function __construct(? Iterable $config, LoggerInterface $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -143,6 +143,8 @@ class Pdo
                         $this->options[$opt] = (string)$val;
                     }
                     break;
+                default:
+                    throw new Exception('invalid option '.$option.' given');
             }
         }
 
@@ -217,7 +219,7 @@ class Pdo
 
     /**
      * Prepare query
-     * 
+     *
      * @param  string $query
      * @param  Iterable $values
      * @return mysqli_stmt

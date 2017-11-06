@@ -14,6 +14,14 @@ namespace Micro\Container;
 interface AdapterAwareInterface
 {
     /**
+     * Get default adapter
+     *
+     * @return array
+     */
+    public function getDefaultAdapter(): array;
+
+
+    /**
      * Has adapter
      *
      * @param  string $name

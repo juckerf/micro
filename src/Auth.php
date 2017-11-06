@@ -92,12 +92,13 @@ class Auth implements AdapterAwareInterface
                 case 'attribute_map_class':
                     $this->{$option} = (string)$value;
                 break;
-
                 case 'adapter':
-                    foreach ($value as $name => $adapter) {
+                    foreach($value as $name => $adapter) {
                         $this->injectAdapter($name, $adapter);
                     }
                 break;
+                default:
+                    throw new Exception('invalid option '.$option.' given');
             }
         }
 
@@ -114,6 +115,17 @@ class Auth implements AdapterAwareInterface
     public function hasAdapter(string $name): bool
     {
         return isset($this->adapter[$name]);
+    }
+
+
+    /**
+     * Get default adapter
+     *
+     * @return array
+     */
+    public function getDefaultAdapter(): array
+    {
+        return [];
     }
 
 

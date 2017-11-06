@@ -78,22 +78,29 @@ class Log extends AbstractLogger implements LoggerInterface, AdapterAwareInterfa
         }
 
         foreach ($config as $option => $value) {
-            if (!isset($value['enabled']) || $value['enabled'] === '1') {
-                if(!isset($value['class'])) {
-                    throw new Exception('class option is requred');
-                }
-
-                if(isset($value['config'])) {
-                    $config = $value['config'];
-                } else {
-                    $config = null;
-                }
-
-                $this->addAdapter($option, $value['class'], $value['config']);
+            switch($option) {
+                case 'adapter':
+                    foreach($value as $name => $adapter) {
+                        $this->injectAdapter($name, $adapter);
+                    }
+                break;
+                default:
+                    throw new Exception('invalid option '.$option.' given');
             }
         }
 
         return $this;
+    }
+
+
+    /**
+     * Get default adapter
+     *
+     * @return array
+     */
+    public function getDefaultAdapter(): array
+    {
+        return [];
     }
 
 

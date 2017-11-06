@@ -267,22 +267,26 @@ class Container implements ContainerInterface
 
         if($instance instanceof AdapterAwareInterface) {
             if(isset($config['adapter'])) {
-                foreach($config['adapter'] as $adapter => $service) {
-                    if(isset($service['enabled']) && $service['enabled'] === '0') {
-                        continue;
-                    }
+                $adapters = $config['adapter'];
+            } else {
+                $adapters = $instance->getDefaultAdapter();
+            }
 
-                    $parents = $parents_orig;
-                    $parents[$adapter] = $service;
-                    $class = $adapter;
-                    $adapter_instance = $this->autoWire($class, $config['adapter'], $parents);
-
-                    if(isset($service['expose']) && $service['expose']) {
-                        $this->service[$adapter]['instance'] = $adapter_instance;
-                    }
-
-                    $instance->injectAdapter($adapter, $adapter_instance);
+            foreach($adapters as $adapter => $service) {
+                if(isset($service['enabled']) && $service['enabled'] === '0') {
+                    continue;
                 }
+
+                $parents = $parents_orig;
+                $parents[$adapter] = $service;
+                $class = $adapter;
+                $adapter_instance = $this->autoWire($class, $adapters, $parents);
+
+                if(isset($service['expose']) && $service['expose']) {
+                    $this->service[$adapter]['instance'] = $adapter_instance;
+                }
+
+                $instance->injectAdapter($adapter, $adapter_instance);
             }
         }
 
