@@ -58,7 +58,7 @@ class Environment implements ConfigInterface
     public function __construct(?string $prefix=null, $delimiter=self::DEFAULT_DELIMITER, array $variables=[])
     {
         $this->delimiter = $delimiter;
-        $this->prefix = strtolower($prefix);
+        $this->prefix = $prefix ? strtolower($prefix) : '';
 
         if(count($variables) === 0) {
             $this->store = $this->variablesToTree(array_merge($_ENV, $_SERVER));
