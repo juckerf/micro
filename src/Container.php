@@ -286,12 +286,51 @@ class Container implements ContainerInterface
                     $this->service[$adapter]['instance'] = $adapter_instance;
                 }
 
-                $instance->injectAdapter($adapter, $adapter_instance);
+                $instance->injectAdapter($adapter_instance, $adapter);
             }
         }
 
         return $instance;
     }
+
+
+    /**
+     * Parse param value
+     *
+     * @param mixed $param
+     * @return mixed
+     */
+    protected function parseParam($param)
+    {
+        if(is_iterable($param)) {
+            foreach($param as $key => $value) {
+                $param[$key] = $this->parseParam($value);
+            }
+
+            return $param;
+        } elseif(is_string($param)) {
+            if(preg_match('#\{ENV\(([A-Za-z0-9_]+)(?:(,?)(.*))\)\}#', $param, $match)) {
+                if(count($match) !== 4) {
+                    return $param;
+                }
+
+                $env = getenv($match[1]);
+                if($env === false && !empty($match[3])) {
+                    return str_replace($match[0], $match[3], $param);
+                } elseif($env === false) {
+                    throw new Exception('env variable '.$match[1].' required but it is neither set not a default value exists');
+                } else {
+                    return str_replace($match[0], $env, $param);
+                }
+            } else {
+                return $param;
+            }
+        } else {
+            return $param;
+        }
+    }
+
+
 
 
     /**
@@ -311,6 +350,6 @@ class Container implements ContainerInterface
             throw new Exception('no configuration available for required service parameter '.$param);
         }
 
-        return $config[$name]['options'][$param];
+        return $this->parseParam($config[$name]['options'][$param]);
     }
 }

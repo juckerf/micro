@@ -94,9 +94,7 @@ class Log extends AbstractLogger implements LoggerInterface, AdapterAwareInterfa
 
 
     /**
-     * Get default adapter
-     *
-     * @return array
+     * {@inheritDoc}
      */
     public function getDefaultAdapter(): array
     {
@@ -105,10 +103,7 @@ class Log extends AbstractLogger implements LoggerInterface, AdapterAwareInterfa
 
 
     /**
-     * Has adapter
-     *
-     * @param  string $name
-     * @return bool
+     * {@inheritDoc}
      */
     public function hasAdapter(string $name): bool
     {
@@ -117,53 +112,31 @@ class Log extends AbstractLogger implements LoggerInterface, AdapterAwareInterfa
 
 
     /**
-     * Add adapter
-     *
-     * @param  string $name
-     * @param  string $class
-     * @param  Iterable $config
-     * @return AdapterInterface
+     * {@inheritDoc}
      */
-    public function addAdapter(string $name, string $class, ? Iterable $config = null) : AdapterInterface
+    public function injectAdapter($adapter, ?string $name=null) : AdapterAwareInterface
     {
-        if ($this->hasAdapter($name)) {
-            throw new Exception('log adapter '.$name.' is already registered');
+        if(!($adapter instanceof AdapterInterface)) {
+            throw new Exception('adapter needs to implement AdapterInterface');
         }
 
-        $adapter = new $class($config);
-        if (!($adapter instanceof AdapterInterface)) {
-            throw new Exception('log adapter must include AdapterInterface interface');
+        if($name === null) {
+            $name = get_class($adapter);
         }
-        $this->adapter[$name] = $adapter;
-        return $adapter;
-    }
 
-
-    /**
-     * Inject adapter
-     *
-     * @param  string $name
-     * @param  AdapterInterface $adapter
-     * @return AdapterInterface
-     */
-    public function injectAdapter(string $name, AdapterInterface $adapter) : AdapterInterface
-    {
         if ($this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is already registered');
         }
 
         $this->adapter[$name] = $adapter;
-        return $adapter;
+        return $this;
     }
 
 
     /**
-     * Get adapter
-     *
-     * @param  string $name
-     * @return AdapterInterface
+     * {@inheritDoc}
      */
-    public function getAdapter(string $name): AdapterInterface
+    public function getAdapter(string $name)
     {
         if (!$this->hasAdapter($name)) {
             throw new Exception('log adapter '.$name.' is not registered');

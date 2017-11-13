@@ -14,7 +14,7 @@ namespace Micro;
 use \Micro\Auth\Exception;
 use \Micro\Auth\Adapter\AdapterInterface;
 use \Micro\Auth\Identity;
-use \Psr\Log\LoggerInterface as Logger;
+use \Psr\Log\LoggerInterface;
 use \Micro\Auth\AttributeMap;
 use \Micro\Container\AdapterAwareInterface;
 
@@ -63,11 +63,11 @@ class Auth implements AdapterAwareInterface
     /**
      * Initialize
      *
-     * @param   Logger $logger
+     * @param   LoggerInterface $logger
      * @param   Iterable $config
      * @return  void
      */
-    public function __construct(Logger $logger, ? Iterable $config = null)
+    public function __construct(LoggerInterface $logger, ? Iterable $config = null)
     {
         $this->logger = $logger;
         $this->setOptions($config);
@@ -107,10 +107,7 @@ class Auth implements AdapterAwareInterface
 
 
     /**
-     * Has adapter
-     *
-     * @param  string $name
-     * @return bool
+     * {@inheritDoc}
      */
     public function hasAdapter(string $name): bool
     {
@@ -119,9 +116,7 @@ class Auth implements AdapterAwareInterface
 
 
     /**
-     * Get default adapter
-     *
-     * @return array
+     * {@inheritDoc}
      */
     public function getDefaultAdapter(): array
     {
@@ -130,30 +125,35 @@ class Auth implements AdapterAwareInterface
 
 
     /**
-     * Inject adapter
-     *
-     * @param  string $name
-     * @param  AdapterInterface $adapter
-     * @return AdapterInterface
+     * {@inheritDoc}
      */
-    public function injectAdapter(string $name, AdapterInterface $adapter) : AdapterInterface
+    public function injectAdapter($adapter, ?string $name=null) : AdapterAwareInterface
     {
+        if(!($adapter instanceof AdapterInterface)) {
+            throw new Exception('adapter needs to implement AdapterInterface');
+        }
+
+        if($name === null) {
+            $name = get_class($adapter);
+        }
+
+        $this->logger->debug('inject auth adapter ['.$name.'] of type ['.get_class($adapter).']', [
+            'category' => get_class($this)
+        ]);
+
         if ($this->hasAdapter($name)) {
             throw new Exception('auth adapter '.$name.' is already registered');
         }
 
         $this->adapter[$name] = $adapter;
-        return $adapter;
+        return $this;
     }
 
 
     /**
-     * Get adapter
-     *
-     * @param  string $name
-     * @return AdapterInterface
+     * {@inheritDoc}
      */
-    public function getAdapter(string $name): AdapterInterface
+    public function getAdapter(string $name)
     {
         if (!$this->hasAdapter($name)) {
             throw new Exception('auth adapter '.$name.' is not registered');
@@ -164,10 +164,7 @@ class Auth implements AdapterAwareInterface
 
 
     /**
-     * Get adapters
-     *
-     * @param  array $adapters
-     * @return array
+     * {@inheritDoc}
      */
     public function getAdapters(array $adapters = []): array
     {

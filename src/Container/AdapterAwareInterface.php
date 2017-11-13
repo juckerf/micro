@@ -33,20 +33,20 @@ interface AdapterAwareInterface
     /**
      * Inject adapter
      *
+     * @param  mixed $adapter
      * @param  string $name
-     * @param  AdapterInterface $adapter
-     * @return AdapterInterface
+     * @return AdapterAwareInterface
      */
-    //public function injectAdapter(string $name, AdapterInterface $adapter): AdapterInterface;
+    public function injectAdapter($adapter, ?string $name=null): AdapterAwareInterface;
 
 
     /**
      * Get adapter
      *
      * @param  string $name
-     * @return AdapterInterface
+     * @return mixed
      */
-    public function getAdapter(string $name)/*: AdapterInterface*/;
+    public function getAdapter(string $name);
 
 
     /**
