@@ -12,6 +12,7 @@ Micro provides minimalistic core features to write a new Application. Instead pr
 
 * \Micro\Auth
 * \Micro\Config
+* \Micro\Container
 * \Micro\Http
 * \Micro\Log
 
