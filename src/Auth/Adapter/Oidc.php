@@ -208,6 +208,7 @@ class Oidc extends AbstractAdapter
             ]);
 
             $url = str_replace('{token}', $token, $this->token_validation_url);
+            $verification = 'verifyIntrospection';
         } else {
             $discovery = $this->getDiscoveryDocument();
             if (!(isset($discovery['userinfo_endpoint']))) {
@@ -219,6 +220,7 @@ class Oidc extends AbstractAdapter
             ]);
 
             $url = $discovery['userinfo_endpoint'].'?access_token='.$token;
+            $verification = 'verifyUserinfo';
         }
 
         $ch = curl_init();
@@ -229,8 +231,61 @@ class Oidc extends AbstractAdapter
         curl_close($ch);
         $response = json_decode($result, true);
 
-        if($code === 200) {
-            $attributes = json_decode($result, true);
+        if ($this->$verification($code, $response)) {
+            $this->access_token = $token;
+            return true;
+        }
+
+        $this->logger->error('failed verify oauth2 access token via authorization server, received status ['.$code.']', [
+           'category' => get_class($this),
+        ]);
+
+        return false;
+    }
+
+
+    /**
+     * Introspection verification
+     *
+     * @param   int $code
+     * @param   array $response
+     * @return  bool
+     */
+    protected function verifyIntrospection(int $code, array $response): bool
+    {
+        if ($code !== 200) {
+            return false;
+        }
+
+        if($response['active']) {
+            $this->logger->debug('successfully verified oauth2 access token via authorization server', [
+               'category' => get_class($this),
+            ]);
+
+            if(!isset($response['username'])) {
+                throw new Exception('attribute \'username\' not found in oauth2 response');
+            }
+
+            $this->identifier = $response['username'];
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Userinfo verification
+     *
+     * @param   int $code
+     * @param   array $response
+     * @return  bool
+     */
+    protected function verifyUserinfo(int $code, ?array $response): bool
+    {
+        if ($code === 200) {
+            $attributes = $response;
             $this->logger->debug('successfully verified oauth2 access token via authorization server', [
                'category' => get_class($this),
             ]);
@@ -240,21 +295,12 @@ class Oidc extends AbstractAdapter
             }
 
             $this->identifier = $attributes['preferred_username'];
-
-            if($this->token_validation_url) {
-                $this->attributes = $attributes;
-            } else {
-                $this->access_token = $token;
-            }
+            $this->attributes = $attributes;
 
             return true;
-        } else {
-            $this->logger->error('failed verify oauth2 access token via authorization server, received status ['.$code.']', [
-               'category' => get_class($this),
-            ]);
-
-            throw new Exception('failed verify oauth2 access token via authorization server');
         }
+
+        return false;
     }
 
 
